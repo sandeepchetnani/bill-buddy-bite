@@ -36,7 +36,7 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
       </div>
       <Input
         type="text"
-        placeholder="Search for items..."
+        placeholder="Search menu items by name or category..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="pl-10 w-full"

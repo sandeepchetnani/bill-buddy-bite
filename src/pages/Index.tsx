@@ -21,7 +21,7 @@ const IndexContent = () => {
                 {restaurantInfo.name}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Restaurant Billing System
+                Indian Restaurant Billing System
               </p>
             </div>
             <Button
