@@ -1,13 +1,52 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { BillProvider } from '../context/BillContext';
+import TransactionsList from '../components/TransactionsList';
+import BillCreator from '../components/BillCreator';
+import { Button } from '../components/ui/button';
+import { useBill } from '../context/BillContext';
+import { restaurantInfo } from '../data/mockData';
+
+const IndexContent = () => {
+  const [showBillCreator, setShowBillCreator] = useState(false);
+  const { transactions } = useBill();
+  
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {!showBillCreator ? (
+        <div className="container max-w-5xl mx-auto py-6 px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-restaurant-primary">
+                {restaurantInfo.name}
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Restaurant Billing System
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowBillCreator(true)}
+              className="bg-restaurant-primary hover:bg-restaurant-secondary"
+              size="lg"
+            >
+              Create New Bill
+            </Button>
+          </div>
+
+          <TransactionsList transactions={transactions} />
+        </div>
+      ) : (
+        <BillCreator onBack={() => setShowBillCreator(false)} />
+      )}
+    </div>
+  );
+};
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <BillProvider>
+      <IndexContent />
+    </BillProvider>
   );
 };
 
