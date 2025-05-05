@@ -248,6 +248,6 @@ export const transactionHistory: Transaction[] = [
 // Restaurant details
 export const restaurantInfo = {
   name: "The Base Four",
-  address: "Wardh Road,Nagpur",
+  address: "Wardha Road,Nagpur",
   phone: "+91 9644196441"
 };
