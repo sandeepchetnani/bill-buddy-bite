@@ -1,3 +1,4 @@
+
 import { MenuItem, restaurantInfo } from '../data/mockData';
 
 export interface BillItem {
@@ -153,7 +154,7 @@ export const generatePrintContent = (bill: Bill): string => {
       
       <div style="text-align: center; margin-bottom: 15px;">
         <h3 style="margin-bottom: 10px;">Scan & Pay</h3>
-        <img src="/lovable-uploads/b2940951-247a-49d5-810b-dfb112ccb936.png" alt="Payment QR Code" style="width: 200px; height: 200px;"/>
+        <img src="/lovable-uploads/82eadedc-6ea6-44ac-a36b-45744b91bf27.png" alt="Payment QR Code" style="width: 200px; height: 200px;"/>
       </div>
       
       <div style="text-align: center; margin-top: 15px;">Thank you for dining with us!</div>
