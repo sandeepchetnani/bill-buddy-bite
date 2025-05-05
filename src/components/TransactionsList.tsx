@@ -2,14 +2,27 @@
 import React from 'react';
 import { Transaction } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatCurrency, formatDate } from '../utils/billUtils';
-import { FileText } from 'lucide-react';
+import { formatCurrency, formatDate, printBill } from '../utils/billUtils';
+import { FileText, Printer } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface TransactionsListProps {
   transactions: Transaction[];
 }
 
 const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => {
+  const handlePrint = (transaction: Transaction) => {
+    // Convert transaction to bill format for printing
+    const bill = {
+      items: transaction.items,
+      total: transaction.total,
+      billNumber: transaction.billNumber,
+      date: new Date(transaction.date)
+    };
+    
+    printBill(bill);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold">Recent Transactions</h2>
@@ -56,6 +69,15 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => 
                     </p>
                   )}
                 </div>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handlePrint(transaction)}
+                  className="w-full mt-4 flex items-center justify-center"
+                >
+                  <Printer className="mr-2 h-4 w-4" /> Print Bill
+                </Button>
               </CardContent>
             </Card>
           ))}

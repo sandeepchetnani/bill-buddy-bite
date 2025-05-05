@@ -1,4 +1,3 @@
-
 import { MenuItem, restaurantInfo } from '../data/mockData';
 
 export interface BillItem {
@@ -48,11 +47,11 @@ export const calculateTotal = (items: BillItem[]): number => {
 };
 
 // Create a new bill
-export const createBill = (items: BillItem[]): Bill => {
+export const createBill = (items: BillItem[], customBillNumber?: string): Bill => {
   return {
     items,
     total: calculateTotal(items),
-    billNumber: generateBillNumber(),
+    billNumber: customBillNumber || generateBillNumber(),
     date: new Date()
   };
 };
