@@ -68,9 +68,6 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
           </div>
           
           <div className="mt-6 border-t pt-4 flex flex-col items-center">
-            <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
-              <ScanQrCode size={20} /> Scan & Pay
-            </h3>
             <img 
               src="/lovable-uploads/b2940951-247a-49d5-810b-dfb112ccb936.png" 
               alt="Payment QR Code" 

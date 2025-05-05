@@ -154,11 +154,10 @@ export const menuItems: MenuItem[] = [
   // Basmati Ki Dawat
   { id: 'bas1', name: 'Curd Rice', price: 150, category: 'Basmati Ki Dawat' },
   { id: 'bas2', name: 'Steemed Rice', price: 160, category: 'Basmati Ki Dawat' },
-  { id: 'bas3', name: 'Jeera Rice', price: 170, category: 'Basmati Ki Dawat' },
-  { id: 'bas4', name: 'Garlic Jeera Rice', price: 180, category: 'Basmati Ki Dawat' },
+  { id: 'bas3', name: 'Jeera Rice', price: 180, category: 'Basmati Ki Dawat' },
+  { id: 'bas4', name: 'Garlic Jeera Rice', price: 190, category: 'Basmati Ki Dawat' },
   { id: 'bas5', name: 'Veg Pulao', price: 200, category: 'Basmati Ki Dawat' },
   { id: 'bas6', name: 'Veg Biryani', price: 220, category: 'Basmati Ki Dawat' },
-  { id: 'bas7', name: 'Egg Biryani', price: 240, category: 'Basmati Ki Dawat' },
   { id: 'bas8', name: 'Chicken Biryani', price: 250, category: 'Basmati Ki Dawat' },
   { id: 'bas9', name: 'Mutton Biryani', price: 350, category: 'Basmati Ki Dawat' },
   { id: 'bas10', name: 'Fish Biryani', price: 350, category: 'Basmati Ki Dawat' },
@@ -178,11 +177,7 @@ export const menuItems: MenuItem[] = [
   { id: 'rot11', name: 'Roti Basket', price: 255, category: 'Rotiyo Ki Tokri' },
   
   // Dessert
-  { id: 'des1', name: 'Ice Cream Vanila (2 scoop)', price: 250, category: 'Dessert' },
-  { id: 'des2', name: 'Hot Gulab Jamun', price: 250, category: 'Dessert' },
-  { id: 'des3', name: 'Sizzling Brownie', price: 350, category: 'Dessert' },
-  { id: 'des4', name: 'Cho Sauce', price: 350, category: 'Dessert' },
-  { id: 'des5', name: 'Sizzling Brownie with Ice Cream', price: 450, category: 'Dessert' },
+  { id: 'des1', name: 'Ice Cream Vanila (2 scoop)', price: 100, category: 'Dessert' }
 ];
 
 // Mock transaction history
