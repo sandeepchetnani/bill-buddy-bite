@@ -33,7 +33,6 @@ export const menuItems: MenuItem[] = [
   { id: 'tnveg5', name: 'Fish Peri-Peri Tikka', price: 360, category: 'Tandoor' },
   { id: 'tnveg6', name: 'Tandoori Chicken Half', price: 300, category: 'Tandoor' },
   { id: 'tnveg7', name: 'Tandoori Chicken Full', price: 500, category: 'Tandoor' },
-  { id: 'tnveg8', name: 'Chicken Oil Rost Full', price: 500, category: 'Tandoor' },
   { id: 'tnveg9', name: 'Tandoori Prawns', price: 420, category: 'Tandoor' },
   
   // Main Course Veg
@@ -98,7 +97,7 @@ export const menuItems: MenuItem[] = [
   { id: 'oveg15', name: 'Paneer Fried Rice', price: 300, category: 'Oriental Starters' },
   
   // Oriental Non-Veg
-  { id: 'onveg1', name: 'Egg Fried Rice', price: 260, category: 'Oriental Non-Veg' },
+  { id: 'onveg1', name: 'Egg Fried Rice', price: 250, category: 'Oriental Non-Veg' },
   { id: 'onveg2', name: 'Chicken Hakka Noodles', price: 280, category: 'Oriental Non-Veg' },
   { id: 'onveg3', name: 'Chilly Chicken', price: 300, category: 'Oriental Non-Veg' },
   { id: 'onveg4', name: 'Chicken 65', price: 300, category: 'Oriental Non-Veg' },
@@ -211,7 +210,5 @@ export const transactionHistory: Transaction[] = [
 export const restaurantInfo = {
   name: "The Base Four",
   address: "Wardh Road,Nagpur",
-  phone: "+91 9644196441",
-  email: "thebasefour@gmi",
-  website: "www.thebasefour.com"
+  phone: "+91 9644196441"
 };
