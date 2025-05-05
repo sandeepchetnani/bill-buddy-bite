@@ -210,8 +210,8 @@ export const transactionHistory: Transaction[] = [
 // Restaurant details
 export const restaurantInfo = {
   name: "The Base Four",
-  address: "123 Fine Dining Street, Mumbai, India",
-  phone: "+91 9876543210",
-  email: "contact@thebasefour.com",
+  address: "Wardh Road,Nagpur",
+  phone: "+91 9644196441",
+  email: "thebasefour@gmi",
   website: "www.thebasefour.com"
 };
