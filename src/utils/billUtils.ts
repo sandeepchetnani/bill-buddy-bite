@@ -151,7 +151,12 @@ export const generatePrintContent = (bill: Bill): string => {
       
       <div style="margin: 20px 0; border-top: 1px dashed #000;"></div>
       
-      <div style="text-align: center; margin-top: 30px;">Thank you for dining with us!</div>
+      <div style="text-align: center; margin-bottom: 15px;">
+        <h3 style="margin-bottom: 10px;">Scan & Pay</h3>
+        <img src="/lovable-uploads/b2940951-247a-49d5-810b-dfb112ccb936.png" alt="Payment QR Code" style="width: 200px; height: 200px;"/>
+      </div>
+      
+      <div style="text-align: center; margin-top: 15px;">Thank you for dining with us!</div>
     </div>
   `;
 };

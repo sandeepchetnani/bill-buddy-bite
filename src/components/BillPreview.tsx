@@ -4,7 +4,7 @@ import { Bill, formatCurrency, printBill } from '../utils/billUtils';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { restaurantInfo } from '../data/mockData';
-import { Printer } from 'lucide-react';
+import { Printer, ScanQrCode } from 'lucide-react';
 
 interface BillPreviewProps {
   bill: Bill;
@@ -65,6 +65,17 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
           <div className="mt-4 flex justify-between text-lg font-bold">
             <span>Total</span>
             <span>{formatCurrency(bill.total)}</span>
+          </div>
+          
+          <div className="mt-6 border-t pt-4 flex flex-col items-center">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
+              <ScanQrCode size={20} /> Scan & Pay
+            </h3>
+            <img 
+              src="/lovable-uploads/b2940951-247a-49d5-810b-dfb112ccb936.png" 
+              alt="Payment QR Code" 
+              className="w-48 h-48 object-contain"
+            />
           </div>
           
           <div className="text-center mt-6 text-sm text-muted-foreground">
