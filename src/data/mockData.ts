@@ -139,6 +139,50 @@ export const menuItems: MenuItem[] = [
   // Salad
   { id: 'sal1', name: 'Green Salad', price: 70, category: 'Salad' },
   { id: 'sal2', name: 'Kachumber Salad', price: 80, category: 'Salad' },
+  
+  // Dal-E-Darbar
+  { id: 'dal1', name: 'Dal Fry', price: 140, category: 'Dal-E-Darbar' },
+  { id: 'dal2', name: 'Dal Tadka', price: 160, category: 'Dal-E-Darbar' },
+  { id: 'dal3', name: 'Dal Kolhapuri', price: 170, category: 'Dal-E-Darbar' },
+  { id: 'dal4', name: 'Dal Lahsuni', price: 180, category: 'Dal-E-Darbar' },
+  { id: 'dal5', name: 'Dal Palak', price: 180, category: 'Dal-E-Darbar' },
+  { id: 'dal6', name: 'Snacks Dal', price: 200, category: 'Dal-E-Darbar' },
+  { id: 'dal7', name: 'Dal Khichdi', price: 220, category: 'Dal-E-Darbar' },
+  { id: 'dal8', name: 'Butter Dal Khichdi', price: 240, category: 'Dal-E-Darbar' },
+  { id: 'dal9', name: 'Masala Dal Khichdi', price: 260, category: 'Dal-E-Darbar' },
+  
+  // Basmati Ki Dawat
+  { id: 'bas1', name: 'Curd Rice', price: 150, category: 'Basmati Ki Dawat' },
+  { id: 'bas2', name: 'Steemed Rice', price: 160, category: 'Basmati Ki Dawat' },
+  { id: 'bas3', name: 'Jeera Rice', price: 170, category: 'Basmati Ki Dawat' },
+  { id: 'bas4', name: 'Garlic Jeera Rice', price: 180, category: 'Basmati Ki Dawat' },
+  { id: 'bas5', name: 'Veg Pulao', price: 200, category: 'Basmati Ki Dawat' },
+  { id: 'bas6', name: 'Veg Biryani', price: 220, category: 'Basmati Ki Dawat' },
+  { id: 'bas7', name: 'Egg Biryani', price: 240, category: 'Basmati Ki Dawat' },
+  { id: 'bas8', name: 'Chicken Biryani', price: 250, category: 'Basmati Ki Dawat' },
+  { id: 'bas9', name: 'Mutton Biryani', price: 350, category: 'Basmati Ki Dawat' },
+  { id: 'bas10', name: 'Fish Biryani', price: 350, category: 'Basmati Ki Dawat' },
+  { id: 'bas11', name: 'Prawns Biryani', price: 450, category: 'Basmati Ki Dawat' },
+  
+  // Rotiyo Ki Tokri
+  { id: 'rot1', name: 'Tawa Roti', price: 20, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot2', name: 'Plain Tandoori Roti', price: 20, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot3', name: 'Butter Tandoori Roti', price: 25, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot4', name: 'Plain Naan', price: 45, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot5', name: 'Butter Naan', price: 50, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot6', name: 'Lachha Paratha', price: 60, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot7', name: 'Garlic Naan', price: 60, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot8', name: 'Butter Garlic Naan', price: 65, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot9', name: 'Cheese Garlic Naan', price: 75, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot10', name: 'Stuff Masala Roti', price: 85, category: 'Rotiyo Ki Tokri' },
+  { id: 'rot11', name: 'Roti Basket', price: 255, category: 'Rotiyo Ki Tokri' },
+  
+  // Dessert
+  { id: 'des1', name: 'Ice Cream Vanila (2 scoop)', price: 250, category: 'Dessert' },
+  { id: 'des2', name: 'Hot Gulab Jamun', price: 250, category: 'Dessert' },
+  { id: 'des3', name: 'Sizzling Brownie', price: 350, category: 'Dessert' },
+  { id: 'des4', name: 'Cho Sauce', price: 350, category: 'Dessert' },
+  { id: 'des5', name: 'Sizzling Brownie with Ice Cream', price: 450, category: 'Dessert' },
 ];
 
 // Mock transaction history
