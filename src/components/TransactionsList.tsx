@@ -3,6 +3,7 @@ import React from 'react';
 import { Transaction } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { formatCurrency, formatDate } from '../utils/billUtils';
+import { FileText } from 'lucide-react';
 
 interface TransactionsListProps {
   transactions: Transaction[];
@@ -14,7 +15,13 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => 
       <h2 className="text-2xl font-semibold">Recent Transactions</h2>
       
       {transactions.length === 0 ? (
-        <p className="text-muted-foreground">No transactions yet.</p>
+        <div className="text-center py-12 bg-white rounded-lg shadow-md">
+          <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">No transactions yet</h3>
+          <p className="mt-2 text-muted-foreground">
+            Create your first bill to see transactions here
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {transactions.map(transaction => (

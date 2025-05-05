@@ -7,6 +7,7 @@ import { useBill } from '../context/BillContext';
 import { MenuItem, menuItems } from '../data/mockData';
 import { formatCurrency } from '../utils/billUtils';
 import BillPreview from './BillPreview';
+import { toast } from "../components/ui/sonner";
 
 interface BillCreatorProps {
   onBack: () => void;
@@ -24,9 +25,15 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
   };
 
   const handleCreateBill = () => {
+    if (currentItems.length === 0) {
+      toast.error("Please add items to the bill first");
+      return;
+    }
+    
     const bill = finalizeBill();
     setCurrentBill(bill);
     setShowPreview(true);
+    toast.success(`Bill #${bill.billNumber} created successfully`);
   };
   
   const total = currentItems.reduce(
@@ -38,6 +45,11 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
     (count, item) => count + item.quantity, 
     0
   );
+
+  const handleBillClose = () => {
+    setShowPreview(false);
+    onBack(); // Return to main page after bill generation
+  };
 
   return (
     <div className="container max-w-5xl mx-auto py-6">
@@ -107,6 +119,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
                   className="w-full bg-restaurant-primary hover:bg-restaurant-secondary"
                   size="lg"
                   onClick={handleCreateBill}
+                  disabled={currentItems.length === 0}
                 >
                   Generate Bill
                 </Button>
@@ -119,7 +132,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
       {showPreview && currentBill && (
         <BillPreview 
           bill={currentBill} 
-          onClose={() => setShowPreview(false)} 
+          onClose={handleBillClose} 
         />
       )}
     </div>

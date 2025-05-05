@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { BillItem, Bill, createBill } from '../utils/billUtils';
-import { Transaction, transactionHistory as initialTransactions } from '../data/mockData';
+import { Transaction } from '../data/mockData';
 
 interface BillContextType {
   currentItems: BillItem[];
@@ -18,7 +17,7 @@ const BillContext = createContext<BillContextType | undefined>(undefined);
 
 export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentItems, setCurrentItems] = useState<BillItem[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const addItem = (item: BillItem) => {
     setCurrentItems(prevItems => {
@@ -59,7 +58,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newBill = createBill(currentItems);
     
     const newTransaction: Transaction = {
-      id: `t${transactions.length + 1}`,
+      id: `t${Date.now()}`, // Use timestamp for unique ID
       billNumber: newBill.billNumber,
       date: newBill.date.toISOString(),
       total: newBill.total,
