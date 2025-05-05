@@ -8,7 +8,7 @@ interface BillContextType {
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearItems: () => void;
-  finalizeBill: () => Bill;
+  finalizeBill: (customBillNumber?: string) => Bill;
   transactions: Transaction[];
   addTransaction: (transaction: Transaction) => void;
 }
@@ -54,8 +54,8 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentItems([]);
   };
 
-  const finalizeBill = () => {
-    const newBill = createBill(currentItems);
+  const finalizeBill = (customBillNumber?: string) => {
+    const newBill = createBill(currentItems, customBillNumber);
     
     const newTransaction: Transaction = {
       id: `t${Date.now()}`, // Use timestamp for unique ID

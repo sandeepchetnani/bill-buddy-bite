@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import ItemSearch from './ItemSearch';
 import ItemsList from './ItemsList';
 import { useBill } from '../context/BillContext';
@@ -17,6 +18,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>(menuItems);
   const [showPreview, setShowPreview] = useState(false);
   const [currentBill, setCurrentBill] = useState<any>(null);
+  const [customBillNumber, setCustomBillNumber] = useState("");
   
   const { currentItems, finalizeBill } = useBill();
   
@@ -30,7 +32,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
       return;
     }
     
-    const bill = finalizeBill();
+    const bill = finalizeBill(customBillNumber.trim() || undefined);
     setCurrentBill(bill);
     setShowPreview(true);
     toast.success(`Bill #${bill.billNumber} created successfully`);
@@ -89,6 +91,19 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
               </div>
             ) : (
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="billNumber" className="text-sm font-medium">
+                    Bill Number (optional)
+                  </label>
+                  <Input
+                    id="billNumber"
+                    placeholder="Enter bill number"
+                    value={customBillNumber}
+                    onChange={(e) => setCustomBillNumber(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                   {currentItems.map(item => (
                     <div 
