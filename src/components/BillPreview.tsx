@@ -25,10 +25,10 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
   });
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto animate-fade-in">
         <CardHeader className="text-center border-b">
-          <CardTitle className="text-2xl font-bold text-restaurant-primary">
+          <CardTitle className="text-2xl font-bold text-black">
             {restaurantInfo.name}
           </CardTitle>
           <div className="text-sm text-muted-foreground">
@@ -37,13 +37,13 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
           </div>
         </CardHeader>
         
-        <CardContent className="pt-6">
-          <div className="flex justify-between mb-4">
+        <CardContent className="pt-1">
+          <div className="flex justify-between mb-1">
             <span className="font-semibold">Bill #{bill.billNumber}</span>
             <span>{formattedDate}</span>
           </div>
           
-          <div className="border-t border-b py-3 space-y-3">
+          <div className="border-t border-b py-2 space-y-2">
             {bill.items.map((item) => (
               <div 
                 key={item.itemId} 
@@ -62,20 +62,20 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
             ))}
           </div>
           
-          <div className="mt-4 flex justify-between text-lg font-bold">
+          <div className="mt-1 flex justify-between text-lg font-bold">
             <span>Total</span>
             <span>{formatCurrency(bill.total)}</span>
           </div>
           
-          <div className="mt-6 border-t pt-4 flex flex-col items-center">
+          <div className="mt-1 border-t pt-4 flex flex-col items-center">
             <img 
               src="/lovable-uploads/b2940951-247a-49d5-810b-dfb112ccb936.png" 
               alt="Payment QR Code" 
-              className="w-48 h-48 object-contain"
+              className="w-36 h-36 object-contain"
             />
           </div>
           
-          <div className="text-center mt-6 text-sm text-muted-foreground">
+          <div className="text-center mt-2 text-sm text-muted-foreground">
             <p>Thank you for dining with us!</p>
             <p>Please visit again</p>
           </div>
