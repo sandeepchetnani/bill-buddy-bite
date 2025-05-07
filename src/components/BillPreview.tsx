@@ -66,15 +66,7 @@ const BillPreview: React.FC<BillPreviewProps> = ({ bill, onClose }) => {
             <span>Total</span>
             <span>{formatCurrency(bill.total)}</span>
           </div>
-          
-          <div className="mt-1 border-t pt-4 flex flex-col items-center">
-            <img 
-              src="/lovable-uploads/82eadedc-6ea6-44ac-a36b-45744b91bf27.png" 
-              alt="Payment QR Code" 
-              className="w-36 h-36 object-contain"
-            />
-          </div>
-          
+
           <div className="text-center mt-2 text-sm text-muted-foreground">
             <p>Thank you for dining with us!</p>
             <p>Please visit again</p>
