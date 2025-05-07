@@ -9,6 +9,7 @@ import { MenuItem, menuItems } from '../data/mockData';
 import { formatCurrency } from '../utils/billUtils';
 import BillPreview from './BillPreview';
 import { toast } from "../components/ui/sonner";
+import { Loader2 } from 'lucide-react';
 
 interface BillCreatorProps {
   onBack: () => void;
@@ -19,6 +20,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentBill, setCurrentBill] = useState<any>(null);
   const [customBillNumber, setCustomBillNumber] = useState("");
+  const [isCreatingBill, setIsCreatingBill] = useState(false);
   
   const { currentItems, finalizeBill } = useBill();
   
@@ -26,16 +28,25 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
     setFilteredItems(items);
   };
 
-  const handleCreateBill = () => {
+  const handleCreateBill = async () => {
     if (currentItems.length === 0) {
       toast.error("Please add items to the bill first");
       return;
     }
     
-    const bill = finalizeBill(customBillNumber.trim() || undefined);
-    setCurrentBill(bill);
-    setShowPreview(true);
-    toast.success(`Bill #${bill.billNumber} created successfully`);
+    setIsCreatingBill(true);
+    
+    try {
+      const bill = await finalizeBill(customBillNumber.trim() || undefined);
+      setCurrentBill(bill);
+      setShowPreview(true);
+      toast.success(`Bill #${bill.billNumber} created successfully`);
+    } catch (error) {
+      console.error('Error creating bill:', error);
+      toast.error("Failed to create bill. Please try again.");
+    } finally {
+      setIsCreatingBill(false);
+    }
   };
   
   const total = currentItems.reduce(
@@ -134,9 +145,16 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
                   className="w-full bg-restaurant-primary hover:bg-restaurant-secondary"
                   size="lg"
                   onClick={handleCreateBill}
-                  disabled={currentItems.length === 0}
+                  disabled={currentItems.length === 0 || isCreatingBill}
                 >
-                  Generate Bill
+                  {isCreatingBill ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Generate Bill'
+                  )}
                 </Button>
               </div>
             )}

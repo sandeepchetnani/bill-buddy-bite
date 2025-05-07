@@ -1,6 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BillItem, Bill, createBill } from '../utils/billUtils';
 import { Transaction } from '../data/mockData';
+import { supabase } from '../integrations/supabase/client';
+import { toast } from "../components/ui/sonner";
 
 interface BillContextType {
   currentItems: BillItem[];
@@ -8,9 +11,10 @@ interface BillContextType {
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearItems: () => void;
-  finalizeBill: (customBillNumber?: string) => Bill;
+  finalizeBill: (customBillNumber?: string) => Promise<Bill>;
   transactions: Transaction[];
-  addTransaction: (transaction: Transaction) => void;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const BillContext = createContext<BillContextType | undefined>(undefined);
@@ -18,6 +22,46 @@ const BillContext = createContext<BillContextType | undefined>(undefined);
 export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentItems, setCurrentItems] = useState<BillItem[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch transactions from Supabase when component mounts
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('transactions')
+          .select('*')
+          .order('date', { ascending: false });
+        
+        if (fetchError) {
+          throw fetchError;
+        }
+        
+        // Transform the data to match our Transaction type
+        const formattedTransactions = data.map((transaction): Transaction => ({
+          id: transaction.id,
+          billNumber: transaction.bill_number,
+          date: transaction.date,
+          total: Number(transaction.total),
+          items: transaction.items
+        }));
+        
+        setTransactions(formattedTransactions);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        setError('Failed to load transactions');
+        toast.error('Failed to load transactions');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   const addItem = (item: BillItem) => {
     setCurrentItems(prevItems => {
@@ -54,25 +98,48 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentItems([]);
   };
 
-  const finalizeBill = (customBillNumber?: string) => {
+  const finalizeBill = async (customBillNumber?: string): Promise<Bill> => {
     const newBill = createBill(currentItems, customBillNumber);
     
-    const newTransaction: Transaction = {
-      id: `t${Date.now()}`, // Use timestamp for unique ID
-      billNumber: newBill.billNumber,
+    // Create a new transaction record to save in Supabase
+    const transactionData = {
+      bill_number: newBill.billNumber,
       date: newBill.date.toISOString(),
       total: newBill.total,
       items: currentItems
     };
     
-    setTransactions(prev => [newTransaction, ...prev]);
-    clearItems();
-    
-    return newBill;
-  };
-
-  const addTransaction = (transaction: Transaction) => {
-    setTransactions(prev => [transaction, ...prev]);
+    try {
+      // Insert the transaction into Supabase
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert(transactionData)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Create a transaction to add to our local state
+      const newTransaction: Transaction = {
+        id: data.id,
+        billNumber: data.bill_number,
+        date: data.date,
+        total: Number(data.total),
+        items: data.items
+      };
+      
+      // Update the local state with the new transaction
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      // Clear current items
+      clearItems();
+      
+      return newBill;
+    } catch (err) {
+      console.error('Error saving transaction:', err);
+      toast.error('Error saving bill to database');
+      throw err;
+    }
   };
 
   return (
@@ -84,7 +151,8 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearItems,
       finalizeBill,
       transactions,
-      addTransaction
+      isLoading,
+      error
     }}>
       {children}
     </BillContext.Provider>

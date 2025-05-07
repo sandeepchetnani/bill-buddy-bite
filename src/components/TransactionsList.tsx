@@ -3,14 +3,20 @@ import React from 'react';
 import { Transaction } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { formatCurrency, formatDate, printBill } from '../utils/billUtils';
-import { FileText, Printer } from 'lucide-react';
+import { FileText, Printer, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface TransactionsListProps {
   transactions: Transaction[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => {
+const TransactionsList: React.FC<TransactionsListProps> = ({ 
+  transactions, 
+  isLoading = false,
+  error = null 
+}) => {
   const handlePrint = (transaction: Transaction) => {
     // Convert transaction to bill format for printing
     const bill = {
@@ -22,6 +28,31 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => 
     
     printBill(bill);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Recent Transactions</h2>
+        <div className="text-center py-12 bg-white rounded-lg shadow-md">
+          <Loader2 className="mx-auto h-12 w-12 text-muted-foreground animate-spin" />
+          <h3 className="mt-4 text-lg font-medium">Loading transactions...</h3>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Recent Transactions</h2>
+        <div className="text-center py-12 bg-white rounded-lg shadow-md">
+          <FileText className="mx-auto h-12 w-12 text-red-500" />
+          <h3 className="mt-4 text-lg font-medium">Error loading transactions</h3>
+          <p className="mt-2 text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

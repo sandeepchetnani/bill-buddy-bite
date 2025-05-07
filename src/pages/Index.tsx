@@ -9,7 +9,7 @@ import { restaurantInfo } from '../data/mockData';
 
 const IndexContent = () => {
   const [showBillCreator, setShowBillCreator] = useState(false);
-  const { transactions } = useBill();
+  const { transactions, isLoading, error } = useBill();
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,7 +33,11 @@ const IndexContent = () => {
             </Button>
           </div>
 
-          <TransactionsList transactions={transactions} />
+          <TransactionsList 
+            transactions={transactions} 
+            isLoading={isLoading}
+            error={error}
+          />
         </div>
       ) : (
         <BillCreator onBack={() => setShowBillCreator(false)} />
