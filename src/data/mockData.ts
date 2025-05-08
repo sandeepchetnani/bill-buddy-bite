@@ -59,6 +59,7 @@ export const menuItems: MenuItem[] = [
   { id: 'mcv20', name: 'Paneer Lababdar', price: 310, category: 'Main Course Veg' },
   { id: 'mcv21', name: 'Paneer Pasandida', price: 310, category: 'Main Course Veg' },
   { id: 'mcv22', name: 'Paneer Lalziz', price: 350, category: 'Main Course Veg' },
+  { id: 'mcv23', name: 'Kaju Masala', price: 350, category: 'Main Course Veg' },
   
   // Main Course Non-Veg
   { id: 'mcnv1', name: 'Egg Bhurjee/Curry', price: 200, category: 'Main Course Non-Veg' },
