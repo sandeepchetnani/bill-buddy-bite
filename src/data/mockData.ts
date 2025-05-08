@@ -1,3 +1,4 @@
+
 // Mock menu items
 export interface MenuItem {
   id: string;
@@ -43,7 +44,7 @@ export const menuItems: MenuItem[] = [
   { id: 'mcv5', name: 'Veg Bhuna', price: 240, category: 'Main Course Veg' },
   { id: 'mcv6', name: 'Rani Palak', price: 250, category: 'Main Course Veg' },
   { id: 'mcv7', name: 'Aloo Gobhi Adraki', price: 260, category: 'Main Course Veg' },
-  { id: 'mcv8', name: 'Mushroom Masala', price: 260, category: 'Main Course Veg' },
+  { id: 'mcv8', name: 'Mushroom Masala', price: 300, category: 'Main Course Veg' },
   { id: 'mcv9', name: 'Baby Corn Mushroom Masala', price: 280, category: 'Main Course Veg' },
   { id: 'mcv10', name: 'Malai Kofta', price: 280, category: 'Main Course Veg' },
   { id: 'mcv11', name: 'Veg Navratna Korma', price: 290, category: 'Main Course Veg' },
@@ -57,6 +58,7 @@ export const menuItems: MenuItem[] = [
   { id: 'mcv19', name: 'Paneer Tikka Masala', price: 310, category: 'Main Course Veg' },
   { id: 'mcv20', name: 'Paneer Lababdar', price: 310, category: 'Main Course Veg' },
   { id: 'mcv21', name: 'Paneer Pasandida', price: 310, category: 'Main Course Veg' },
+  { id: 'mcv22', name: 'Paneer Lalziz', price: 350, category: 'Main Course Veg' },
   
   // Main Course Non-Veg
   { id: 'mcnv1', name: 'Egg Bhurjee/Curry', price: 200, category: 'Main Course Non-Veg' },
@@ -125,6 +127,7 @@ export const menuItems: MenuItem[] = [
   { id: 'aveg4', name: 'Honey Chilly Potato', price: 220, category: 'Appetizers' },
   { id: 'aveg5', name: 'Paneer Pakoda', price: 220, category: 'Appetizers' },
   { id: 'aveg6', name: 'Paneer Fingure', price: 220, category: 'Appetizers' },
+  { id: 'aveg7', name: 'Peri Peri Fries', price: 220, category: 'Appetizers' },
   { id: 'anveg1', name: 'Egg Boil/Fry', price: 70, category: 'Appetizers' },
   { id: 'anveg2', name: 'Chicken Pakoda', price: 270, category: 'Appetizers' },
   { id: 'anveg3', name: 'Chicken Fingure', price: 300, category: 'Appetizers' },
