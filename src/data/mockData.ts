@@ -1,4 +1,3 @@
-
 // Mock menu items
 export interface MenuItem {
   id: string;
@@ -24,6 +23,7 @@ export const menuItems: MenuItem[] = [
   { id: 'tveg4', name: 'Tandoori Mushroom', price: 300, category: 'Tandoor' },
   { id: 'tveg5', name: 'Paneer Peri-Peri Tikka', price: 310, category: 'Tandoor' },
   { id: 'tveg6', name: 'Paneer Kali Miri Tikka', price: 320, category: 'Tandoor' },
+  { id: 'tveg7', name: 'Cheese Seekh Kabab', price: 320, category: 'Tandoor' },
   
   // Tandoor Non-Veg
   { id: 'tnveg1', name: 'Chicken Tikka/Achari', price: 330, category: 'Tandoor' },
