@@ -4,6 +4,7 @@ import { BillItem, Bill, createBill } from '../utils/billUtils';
 import { Transaction } from '../data/mockData';
 import { supabase } from '../integrations/supabase/client';
 import { toast } from "../components/ui/sonner";
+import { Json } from '../integrations/supabase/types';
 
 interface BillContextType {
   currentItems: BillItem[];
@@ -47,7 +48,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
           billNumber: transaction.bill_number,
           date: transaction.date,
           total: Number(transaction.total),
-          items: transaction.items
+          items: transaction.items as unknown as BillItem[]
         }));
         
         setTransactions(formattedTransactions);
@@ -106,7 +107,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       bill_number: newBill.billNumber,
       date: newBill.date.toISOString(),
       total: newBill.total,
-      items: currentItems
+      items: currentItems as unknown as Json
     };
     
     try {
@@ -125,7 +126,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
         billNumber: data.bill_number,
         date: data.date,
         total: Number(data.total),
-        items: data.items
+        items: data.items as unknown as BillItem[]
       };
       
       // Update the local state with the new transaction
