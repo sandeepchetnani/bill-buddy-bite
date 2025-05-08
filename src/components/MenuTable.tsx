@@ -119,7 +119,7 @@ const MenuTable = () => {
           price,
           category
         })
-        .eq('id', currentItemId); // This line had the type error - currentItemId is now a string
+        .eq('id', currentItemId);
 
       if (error) {
         toast.error("Failed to update item");
