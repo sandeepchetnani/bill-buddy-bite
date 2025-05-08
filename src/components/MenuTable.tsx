@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { menuItems, MenuItem } from "../data/mockData";
+import React, { useState, useEffect } from "react";
+import { MenuItem } from "../data/mockData";
 import { 
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell 
 } from "./ui/table";
@@ -8,10 +8,12 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { toast } from "./ui/sonner";
-import { Plus, Pencil, Trash } from "lucide-react";
+import { Plus, Pencil, Trash, Loader2 } from "lucide-react";
+import { supabase } from "../integrations/supabase/client";
 
 const MenuTable = () => {
-  const [items, setItems] = useState<MenuItem[]>(menuItems);
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [name, setName] = useState("");
@@ -29,46 +31,138 @@ const MenuTable = () => {
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddItem = () => {
+  // Fetch menu items from Supabase
+  useEffect(() => {
+    async function fetchMenuItems() {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select('*');
+
+        if (error) {
+          toast.error("Failed to fetch menu items");
+          console.error("Error fetching menu items:", error);
+        } else {
+          // Transform the data to match our MenuItem interface
+          const transformedItems: MenuItem[] = data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            price: parseFloat(item.price),
+            category: item.category
+          }));
+          setItems(transformedItems);
+        }
+      } catch (error) {
+        console.error("Error in fetchMenuItems:", error);
+        toast.error("An unexpected error occurred");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchMenuItems();
+  }, []);
+
+  const handleAddItem = async () => {
     if (!name || !category || price <= 0) {
       toast.error("Please fill all fields correctly");
       return;
     }
 
-    const newItem: MenuItem = {
-      id: `item-${Date.now()}`,
-      name,
-      price,
-      category
-    };
+    try {
+      const { data, error } = await supabase
+        .from('menu_items')
+        .insert([{
+          name,
+          price,
+          category
+        }])
+        .select();
 
-    setItems(prev => [...prev, newItem]);
-    resetForm();
-    setIsAddDialogOpen(false);
-    toast.success("Item added successfully");
+      if (error) {
+        toast.error("Failed to add item");
+        console.error("Error adding item:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const newItem: MenuItem = {
+          id: data[0].id,
+          name: data[0].name,
+          price: parseFloat(data[0].price),
+          category: data[0].category
+        };
+        
+        setItems(prev => [...prev, newItem]);
+        resetForm();
+        setIsAddDialogOpen(false);
+        toast.success("Item added successfully");
+      }
+    } catch (error) {
+      console.error("Error in handleAddItem:", error);
+      toast.error("An unexpected error occurred");
+    }
   };
 
-  const handleEditItem = () => {
+  const handleEditItem = async () => {
     if (!name || !category || price <= 0 || !currentItemId) {
       toast.error("Please fill all fields correctly");
       return;
     }
 
-    setItems(prev => 
-      prev.map(item => 
-        item.id === currentItemId 
-          ? { ...item, name, price, category } 
-          : item
-      )
-    );
-    resetForm();
-    setIsEditDialogOpen(false);
-    toast.success("Item updated successfully");
+    try {
+      const { error } = await supabase
+        .from('menu_items')
+        .update({
+          name,
+          price,
+          category
+        })
+        .eq('id', currentItemId);
+
+      if (error) {
+        toast.error("Failed to update item");
+        console.error("Error updating item:", error);
+        return;
+      }
+
+      setItems(prev => 
+        prev.map(item => 
+          item.id === currentItemId 
+            ? { ...item, name, price, category } 
+            : item
+        )
+      );
+      
+      resetForm();
+      setIsEditDialogOpen(false);
+      toast.success("Item updated successfully");
+    } catch (error) {
+      console.error("Error in handleEditItem:", error);
+      toast.error("An unexpected error occurred");
+    }
   };
 
-  const handleDeleteItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-    toast.success("Item deleted successfully");
+  const handleDeleteItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('menu_items')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error("Failed to delete item");
+        console.error("Error deleting item:", error);
+        return;
+      }
+
+      setItems(prev => prev.filter(item => item.id !== id));
+      toast.success("Item deleted successfully");
+    } catch (error) {
+      console.error("Error in handleDeleteItem:", error);
+      toast.error("An unexpected error occurred");
+    }
   };
 
   const openEditDialog = (item: MenuItem) => {
@@ -120,7 +214,16 @@ const MenuTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8">
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span>Loading menu items...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredItems.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-6">
                   No items found
