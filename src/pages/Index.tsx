@@ -1,15 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BillProvider } from '../context/BillContext';
 import TransactionsList from '../components/TransactionsList';
 import BillCreator from '../components/BillCreator';
 import { Button } from '../components/ui/button';
 import { useBill } from '../context/BillContext';
 import { restaurantInfo } from '../data/mockData';
+import { toast } from "../components/ui/sonner";
 
 const IndexContent = () => {
   const [showBillCreator, setShowBillCreator] = useState(false);
-  const { transactions, isLoading, error } = useBill();
+  const { transactions, isLoading, error, isEditing, cancelEditing, currentEditingId } = useBill();
+  
+  // Show bill creator when in editing mode
+  useEffect(() => {
+    if (isEditing) {
+      setShowBillCreator(true);
+    }
+  }, [isEditing]);
+
+  // Handler to go back, checking if in edit mode
+  const handleBack = () => {
+    if (isEditing) {
+      cancelEditing();
+    }
+    setShowBillCreator(false);
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,7 +56,11 @@ const IndexContent = () => {
           />
         </div>
       ) : (
-        <BillCreator onBack={() => setShowBillCreator(false)} />
+        <BillCreator 
+          onBack={handleBack} 
+          isEditing={isEditing}
+          editingId={currentEditingId}
+        />
       )}
     </div>
   );

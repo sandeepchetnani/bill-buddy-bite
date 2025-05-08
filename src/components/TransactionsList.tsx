@@ -1,10 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Transaction } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { formatCurrency, formatDate, printBill } from '../utils/billUtils';
-import { FileText, Printer, Loader2 } from 'lucide-react';
+import { FileText, Printer, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { useBill } from '../context/BillContext';
 
 interface TransactionsListProps {
   transactions: Transaction[];
@@ -17,6 +29,9 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   isLoading = false,
   error = null 
 }) => {
+  const { deleteTransaction, editTransaction } = useBill();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const handlePrint = (transaction: Transaction) => {
     // Convert transaction to bill format for printing
     const bill = {
@@ -27,6 +42,16 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     };
     
     printBill(bill);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    await deleteTransaction(id);
+    setDeletingId(null);
+  };
+
+  const handleEdit = (id: string) => {
+    editTransaction(id);
   };
 
   if (isLoading) {
@@ -101,14 +126,62 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                   )}
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handlePrint(transaction)}
-                  className="w-full mt-4 flex items-center justify-center"
-                >
-                  <Printer className="mr-2 h-4 w-4" /> Print Bill
-                </Button>
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handlePrint(transaction)}
+                    className="flex-1 flex items-center justify-center"
+                  >
+                    <Printer className="mr-2 h-4 w-4" /> Print
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(transaction.id)}
+                    className="flex items-center justify-center"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center justify-center text-red-500 hover:text-red-600 hover:border-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Transaction</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete bill {transaction.billNumber}? 
+                          This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(transaction.id);
+                          }}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          {deletingId === transaction.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Delete"
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </CardContent>
             </Card>
           ))}
