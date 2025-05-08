@@ -13,9 +13,11 @@ import { Loader2 } from 'lucide-react';
 
 interface BillCreatorProps {
   onBack: () => void;
+  isEditing?: boolean;
+  editingId?: string | null;
 }
 
-const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
+const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, editingId = null }) => {
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>(menuItems);
   const [showPreview, setShowPreview] = useState(false);
   const [currentBill, setCurrentBill] = useState<any>(null);
@@ -40,10 +42,10 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
       const bill = await finalizeBill(customBillNumber.trim() || undefined);
       setCurrentBill(bill);
       setShowPreview(true);
-      toast.success(`Bill #${bill.billNumber} created successfully`);
+      toast.success(`Bill #${bill.billNumber} ${isEditing ? 'updated' : 'created'} successfully`);
     } catch (error) {
       console.error('Error creating bill:', error);
-      toast.error("Failed to create bill. Please try again.");
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} bill. Please try again.`);
     } finally {
       setIsCreatingBill(false);
     }
@@ -75,7 +77,9 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
           ← Back to Transactions
         </Button>
         
-        <h1 className="text-3xl font-bold text-restaurant-primary">Create New Bill</h1>
+        <h1 className="text-3xl font-bold text-restaurant-primary">
+          {isEditing ? 'Edit Bill' : 'Create New Bill'}
+        </h1>
         
         <div className="w-[100px]"></div>
       </div>
@@ -93,7 +97,9 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
         
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-            <h2 className="text-xl font-bold mb-4 text-restaurant-tertiary">Current Bill</h2>
+            <h2 className="text-xl font-bold mb-4 text-restaurant-tertiary">
+              {isEditing ? 'Edit Bill' : 'Current Bill'}
+            </h2>
             
             {currentItems.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -104,7 +110,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="billNumber" className="text-sm font-medium">
-                    Bill Number (optional)
+                    Bill Number {isEditing ? '(updating)' : '(optional)'}
                   </label>
                   <Input
                     id="billNumber"
@@ -153,7 +159,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack }) => {
                       Processing...
                     </>
                   ) : (
-                    'Generate Bill'
+                    isEditing ? 'Update Bill' : 'Generate Bill'
                   )}
                 </Button>
               </div>
