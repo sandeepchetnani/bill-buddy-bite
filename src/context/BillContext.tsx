@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BillItem, Bill, createBill } from '../utils/billUtils';
 import { Transaction } from '../data/mockData';
@@ -118,16 +117,35 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     try {
-      // Insert the transaction into Supabase
-      const { data, error } = await supabase
-        .from('transactions')
-        .insert(transactionData)
-        .select()
-        .single();
+      let data;
+      let error;
+      
+      // If we're editing, update the existing transaction
+      if (isEditing && currentEditingId) {
+        const response = await supabase
+          .from('transactions')
+          .update(transactionData)
+          .eq('id', currentEditingId)
+          .select()
+          .single();
+          
+        data = response.data;
+        error = response.error;
+      } else {
+        // Otherwise insert a new transaction
+        const response = await supabase
+          .from('transactions')
+          .insert(transactionData)
+          .select()
+          .single();
+          
+        data = response.data;
+        error = response.error;
+      }
       
       if (error) throw error;
       
-      // Create a transaction to add to our local state
+      // Create a transaction to add to or update in our local state
       const newTransaction: Transaction = {
         id: data.id,
         billNumber: data.bill_number,
@@ -136,8 +154,16 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
         items: data.items as unknown as BillItem[]
       };
       
-      // Update the local state with the new transaction
-      setTransactions(prev => [newTransaction, ...prev]);
+      // Update the local state with the new or updated transaction
+      if (isEditing && currentEditingId) {
+        // Replace the edited transaction in the array
+        setTransactions(prev => 
+          prev.map(t => t.id === currentEditingId ? newTransaction : t)
+        );
+      } else {
+        // Add the new transaction to the beginning of the array
+        setTransactions(prev => [newTransaction, ...prev]);
+      }
       
       // Clear current items if not in editing mode
       if (!isEditing) {
@@ -158,7 +184,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // New function to delete a transaction
+  // Function to delete a transaction
   const deleteTransaction = async (id: string) => {
     try {
       setIsLoading(true);
@@ -182,7 +208,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // New function to start editing a transaction
+  // Function to start editing a transaction
   const editTransaction = (id: string) => {
     const transaction = transactions.find(t => t.id === id);
     if (transaction) {
