@@ -112,12 +112,12 @@ const MenuTable = () => {
     }
 
     try {
-      // Fix: Convert price to string when sending to Supabase
+      // Convert price to number when sending to Supabase
       const { error } = await supabase
         .from('menu_items')
         .update({
           name,
-          price,
+          price, // Supabase will handle type conversion automatically
           category
         })
         .eq('id', currentItemId);
