@@ -41,7 +41,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({
         .from('menu_items')
         .insert([{
           name,
-          price,
+          price: price.toString(), // Convert number to string here
           category
         }])
         .select();
