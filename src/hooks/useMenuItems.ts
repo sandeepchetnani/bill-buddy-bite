@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { MenuItem } from "../data/mockData";
 import { supabase } from "../integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
@@ -8,15 +8,34 @@ export const useMenuItems = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Get unique categories for filtering
-  const categories = Array.from(new Set(items.map(item => item.category)));
-
-  // Filter items based on search term
-  const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const categories = useMemo(() => 
+    Array.from(new Set(items.map(item => item.category))),
+    [items]
   );
+
+  // Filter items based on search term and selected category
+  const filteredItems = useMemo(() => {
+    let result = items;
+    
+    // Apply category filter if selected
+    if (selectedCategory) {
+      result = result.filter(item => item.category === selectedCategory);
+    }
+    
+    // Apply search term filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(item => 
+        item.name.toLowerCase().includes(term) ||
+        item.category.toLowerCase().includes(term)
+      );
+    }
+    
+    return result;
+  }, [items, searchTerm, selectedCategory]);
 
   // Fetch menu items from Supabase
   const fetchMenuItems = async () => {
@@ -34,7 +53,7 @@ export const useMenuItems = () => {
         const transformedItems: MenuItem[] = data.map((item: any) => ({
           id: item.id,
           name: item.name,
-          price: parseFloat(item.price),
+          price: Number(item.price), // Ensure price is a number
           category: item.category
         }));
         setItems(transformedItems);
@@ -93,6 +112,8 @@ export const useMenuItems = () => {
     categories,
     searchTerm,
     setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
     handleDeleteItem,
     addItem,
     updateItem,

@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Plus } from "lucide-react";
 import { MenuItem } from "../data/mockData";
 import { useMenuItems } from "../hooks/useMenuItems";
 import AddItemDialog from "./menu/AddItemDialog";
 import EditItemDialog from "./menu/EditItemDialog";
 import MenuItemsTable from "./menu/MenuItemsTable";
+import ItemSearch from "./ItemSearch";
 
 const MenuTable = () => {
   const {
@@ -15,8 +15,6 @@ const MenuTable = () => {
     isLoading,
     filteredItems,
     categories,
-    searchTerm,
-    setSearchTerm,
     handleDeleteItem,
     addItem,
     updateItem
@@ -25,10 +23,15 @@ const MenuTable = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<MenuItem | null>(null);
+  const [searchResults, setSearchResults] = useState<MenuItem[]>(items);
 
   const openEditDialog = (item: MenuItem) => {
     setCurrentItem(item);
     setIsEditDialogOpen(true);
+  };
+
+  const handleSearch = (results: MenuItem[]) => {
+    setSearchResults(results);
   };
 
   return (
@@ -45,19 +48,14 @@ const MenuTable = () => {
         </Button>
       </div>
 
-      <div className="flex mb-4">
-        <Input
-          placeholder="Search items..."
-          className="max-w-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="mb-6">
+        <ItemSearch items={items} onSearch={handleSearch} />
       </div>
 
       <MenuItemsTable
         items={items}
         isLoading={isLoading}
-        filteredItems={filteredItems}
+        filteredItems={searchResults}
         onEditItem={openEditDialog}
         onDeleteItem={handleDeleteItem}
       />
