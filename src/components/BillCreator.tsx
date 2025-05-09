@@ -1,15 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import ItemSearch from './ItemSearch';
 import ItemsList from './ItemsList';
 import { useBill } from '../context/BillContext';
-import { MenuItem, menuItems } from '../data/mockData';
+import { MenuItem } from '../data/mockData';
 import { formatCurrency } from '../utils/billUtils';
 import BillPreview from './BillPreview';
 import { toast } from "../components/ui/sonner";
 import { Loader2 } from 'lucide-react';
+import { supabase } from '../integrations/supabase/client';
 
 interface BillCreatorProps {
   onBack: () => void;
@@ -18,13 +19,49 @@ interface BillCreatorProps {
 }
 
 const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, editingId = null }) => {
-  const [filteredItems, setFilteredItems] = useState<MenuItem[]>(menuItems);
+  const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
+  const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [currentBill, setCurrentBill] = useState<any>(null);
   const [customBillNumber, setCustomBillNumber] = useState("");
   const [isCreatingBill, setIsCreatingBill] = useState(false);
+  const [isLoadingItems, setIsLoadingItems] = useState(true);
   
   const { currentItems, finalizeBill } = useBill();
+  
+  // Fetch all menu items from database
+  useEffect(() => {
+    async function fetchMenuItems() {
+      setIsLoadingItems(true);
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select('*');
+
+        if (error) {
+          toast.error("Failed to fetch menu items");
+          console.error("Error fetching menu items:", error);
+        } else {
+          // Transform the data to match our MenuItem interface
+          const transformedItems: MenuItem[] = data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            price: parseFloat(item.price),
+            category: item.category
+          }));
+          setAllMenuItems(transformedItems);
+          setFilteredItems(transformedItems);
+        }
+      } catch (error) {
+        console.error("Error in fetchMenuItems:", error);
+        toast.error("An unexpected error occurred loading menu items");
+      } finally {
+        setIsLoadingItems(false);
+      }
+    }
+
+    fetchMenuItems();
+  }, []);
   
   const handleSearch = (items: MenuItem[]) => {
     setFilteredItems(items);
@@ -87,11 +124,18 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-            <ItemSearch items={menuItems} onSearch={handleSearch} />
+            <ItemSearch items={allMenuItems} onSearch={handleSearch} />
           </div>
           
           <div className="bg-white rounded-lg shadow-md p-6">
-            <ItemsList items={filteredItems} />
+            {isLoadingItems ? (
+              <div className="flex justify-center items-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-restaurant-primary" />
+                <span className="ml-2 text-lg">Loading menu items...</span>
+              </div>
+            ) : (
+              <ItemsList items={filteredItems} />
+            )}
           </div>
         </div>
         
