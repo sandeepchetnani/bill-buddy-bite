@@ -39,11 +39,11 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({
     try {
       const { data, error } = await supabase
         .from('menu_items')
-        .insert([{
+        .insert({
           name,
-          price: price.toString(), // Convert number to string here
+          price, // Keep as number, no conversion needed
           category
-        }])
+        })
         .select();
 
       if (error) {
@@ -56,7 +56,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({
         const newItem: MenuItem = {
           id: data[0].id,
           name: data[0].name,
-          price: parseFloat(data[0].price),
+          price: data[0].price,
           category: data[0].category
         };
         

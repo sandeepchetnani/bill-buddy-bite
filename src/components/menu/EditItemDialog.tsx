@@ -46,7 +46,7 @@ const EditItemDialog: React.FC<EditItemDialogProps> = ({
         .from('menu_items')
         .update({
           name,
-          price: price.toString(), // Convert number to string here
+          price, // Keep as number, no conversion needed
           category
         })
         .eq('id', item.id);
