@@ -112,6 +112,7 @@ const MenuTable = () => {
     }
 
     try {
+      // Fix: Convert price to string when sending to Supabase
       const { error } = await supabase
         .from('menu_items')
         .update({
