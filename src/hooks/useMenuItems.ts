@@ -1,8 +1,8 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { MenuItem } from "../data/mockData";
 import { supabase } from "../integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
+import { fuzzySearch } from "../utils/fuzzySearch";
 
 export const useMenuItems = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -26,13 +26,9 @@ export const useMenuItems = () => {
       result = result.filter(item => item.category === selectedCategory);
     }
     
-    // Apply search term filter
+    // Apply fuzzy search filter for search term
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(item => 
-        item.name.toLowerCase().includes(term) ||
-        item.category.toLowerCase().includes(term)
-      );
+      result = fuzzySearch(result, searchTerm, ['name', 'category']);
     }
     
     return result;

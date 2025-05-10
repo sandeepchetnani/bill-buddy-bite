@@ -1,5 +1,5 @@
-
 import { MenuItem, restaurantInfo } from '../data/mockData';
+import { fuzzySearch } from './fuzzySearch';
 
 export interface BillItem {
   itemId: string;
@@ -57,15 +57,10 @@ export const createBill = (items: BillItem[], billNumber?: string): Bill => {
   };
 };
 
-// Filter items based on search query
+// Filter items based on search query - now using fuzzy search
 export const filterItems = (items: MenuItem[], query: string): MenuItem[] => {
   if (!query) return items;
-  
-  const lowerQuery = query.toLowerCase();
-  return items.filter(item =>
-    item.name.toLowerCase().includes(lowerQuery) ||
-    item.category.toLowerCase().includes(lowerQuery)
-  );
+  return fuzzySearch(items, query, ['name', 'category']);
 };
 
 // Get restaurant details for bill

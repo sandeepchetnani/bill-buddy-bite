@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MenuItem } from '../data/mockData';
 import { Input } from './ui/input';
 import { Search, X } from 'lucide-react';
@@ -15,6 +15,8 @@ import {
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { Badge } from './ui/badge';
+import { fuzzySearch } from '../utils/fuzzySearch';
+import { debounce } from '../utils/debounce';
 
 interface ItemSearchProps {
   items: MenuItem[];
@@ -29,24 +31,34 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
   // Get unique categories
   const categories = Array.from(new Set(items.map(item => item.category))).sort();
   
+  // Create a debounced search function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((query: string, categories: string[]) => {
+      let filtered = items;
+      
+      if (categories.length > 0) {
+        filtered = filtered.filter(item => categories.includes(item.category));
+      }
+      
+      if (query) {
+        filtered = fuzzySearch(
+          filtered, 
+          query, 
+          ['name', 'category'], 
+          -10000
+        );
+      }
+      
+      onSearch(filtered);
+    }, 150),
+    [items, onSearch]
+  );
+  
   // Filter items based on search query and selected categories
   useEffect(() => {
-    let filtered = items;
-    
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(item => selectedCategories.includes(item.category));
-    }
-    
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.name.toLowerCase().includes(query) || 
-        item.category.toLowerCase().includes(query)
-      );
-    }
-    
-    onSearch(filtered);
-  }, [searchQuery, selectedCategories, items, onSearch]);
+    debouncedSearch(searchQuery, selectedCategories);
+  }, [searchQuery, selectedCategories, debouncedSearch]);
   
   // Clear filter when items change
   useEffect(() => {
@@ -165,12 +177,15 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
           <CommandList>
             <CommandEmpty>No items found.</CommandEmpty>
             {categories.map(category => {
-              const categoryItems = items
-                .filter(item => item.category === category)
-                .filter(item => 
-                  !searchQuery ||
-                  item.name.toLowerCase().includes(searchQuery.toLowerCase())
-                );
+              // Use fuzzy search for the command dialog items too
+              const categoryItems = searchQuery 
+                ? fuzzySearch(
+                    items.filter(item => item.category === category),
+                    searchQuery,
+                    ['name'],
+                    -10000
+                  )
+                : items.filter(item => item.category === category);
                 
               if (categoryItems.length === 0) return null;
               
