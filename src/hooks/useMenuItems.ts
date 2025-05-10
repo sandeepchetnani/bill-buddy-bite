@@ -9,6 +9,7 @@ export const useMenuItems = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Get unique categories for filtering
   const categories = useMemo(() => 
@@ -40,7 +41,10 @@ export const useMenuItems = () => {
   // Fetch menu items from Supabase
   const fetchMenuItems = async () => {
     setIsLoading(true);
+    setError(null);
+    
     try {
+      console.log("Fetching menu items from Supabase...");
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
@@ -48,9 +52,14 @@ export const useMenuItems = () => {
         .order('name', { ascending: true });
 
       if (error) {
+        setError("Failed to fetch menu items");
         toast.error("Failed to fetch menu items");
         console.error("Error fetching menu items:", error);
+      } else if (!data || data.length === 0) {
+        console.log("No menu items found in the database");
+        setItems([]);
       } else {
+        console.log("Menu items fetched successfully:", data);
         // Transform the data to match our MenuItem interface
         const transformedItems: MenuItem[] = data.map((item: any) => ({
           id: item.id,
@@ -62,6 +71,7 @@ export const useMenuItems = () => {
       }
     } catch (error) {
       console.error("Error in fetchMenuItems:", error);
+      setError("An unexpected error occurred");
       toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -119,6 +129,7 @@ export const useMenuItems = () => {
     handleDeleteItem,
     addItem,
     updateItem,
-    fetchMenuItems
+    fetchMenuItems,
+    error
   };
 };

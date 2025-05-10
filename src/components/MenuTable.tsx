@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
 import { MenuItem } from "../data/mockData";
@@ -9,6 +9,7 @@ import EditItemDialog from "./menu/EditItemDialog";
 import MenuItemsTable from "./menu/MenuItemsTable";
 import ItemSearch from "./ItemSearch";
 import { ScrollArea } from "./ui/scroll-area";
+import { toast } from "./ui/sonner";
 
 const MenuTable = () => {
   const {
@@ -18,13 +19,26 @@ const MenuTable = () => {
     categories,
     handleDeleteItem,
     addItem,
-    updateItem
+    updateItem,
+    fetchMenuItems,
+    error
   } = useMenuItems();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<MenuItem | null>(null);
   const [searchResults, setSearchResults] = useState<MenuItem[]>(items);
+
+  // Refresh search results when items change
+  useEffect(() => {
+    setSearchResults(items);
+  }, [items]);
+
+  // Fetch menu items on mount
+  useEffect(() => {
+    console.log("MenuTable mounted, fetching menu items...");
+    fetchMenuItems();
+  }, []);
 
   const openEditDialog = (item: MenuItem) => {
     setCurrentItem(item);
@@ -33,6 +47,12 @@ const MenuTable = () => {
 
   const handleSearch = (results: MenuItem[]) => {
     setSearchResults(results);
+  };
+
+  const handleRefreshItems = () => {
+    console.log("Manually refreshing menu items...");
+    fetchMenuItems();
+    toast.success("Menu items refreshed");
   };
 
   return (
@@ -44,10 +64,24 @@ const MenuTable = () => {
             Manage your restaurant menu items and prices
           </p>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center">
-          <Plus className="mr-2 h-4 w-4" /> Add New Item
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleRefreshItems}
+          >
+            Refresh
+          </Button>
+          <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center">
+            <Plus className="mr-2 h-4 w-4" /> Add New Item
+          </Button>
+        </div>
       </div>
+
+      {error && (
+        <div className="mb-4 p-4 border border-red-300 bg-red-50 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
 
       <div className="mb-6">
         <ItemSearch items={items} onSearch={handleSearch} />

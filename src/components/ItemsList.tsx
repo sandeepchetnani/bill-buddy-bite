@@ -31,6 +31,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems, showSearchBar =
   // Fetch menu items from Supabase if not provided as props
   useEffect(() => {
     if (propItems && propItems.length > 0) {
+      console.log("Using provided items:", propItems);
       setItems(propItems);
       setIsLoading(false);
       return;
@@ -41,6 +42,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems, showSearchBar =
       setError(null);
       
       try {
+        console.log("Fetching menu items in ItemsList component...");
         const { data, error } = await supabase
           .from('menu_items')
           .select('*');
@@ -49,7 +51,11 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems, showSearchBar =
           setError("Failed to fetch menu items");
           toast.error("Failed to fetch menu items");
           console.error("Error fetching menu items:", error);
+        } else if (!data || data.length === 0) {
+          console.log("No menu items found in database");
+          setItems([]);
         } else {
+          console.log("Menu items fetched successfully:", data);
           // Transform the data to match our MenuItem interface
           const transformedItems: MenuItem[] = data.map((item: any) => ({
             id: item.id,
@@ -130,6 +136,13 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems, showSearchBar =
   const handleTabChange = (value: string) => {
     setSelectedTab(value === 'all' ? null : value);
   };
+
+  console.log("ItemsList rendering state:", {
+    isLoading,
+    itemsCount: items.length,
+    error,
+    categories
+  });
 
   if (isLoading) {
     return <LoadingState />;
