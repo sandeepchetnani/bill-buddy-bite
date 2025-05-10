@@ -182,22 +182,24 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems }) => {
       {/* Category tabs */}
       <div>
         <Tabs defaultValue="all" value={selectedTab === null ? 'all' : selectedTab} onValueChange={handleTabChange}>
-          <ScrollArea className="w-full" orientation="horizontal">
-            <TabsList className="h-auto p-1 flex-wrap">
-              <TabsTrigger value="all" className="text-sm py-1 px-3">
-                All Categories
-              </TabsTrigger>
-              {categories.map(category => (
-                <TabsTrigger 
-                  key={category} 
-                  value={category}
-                  className="text-sm py-1 px-3"
-                >
-                  {category}
+          <div className="relative w-full">
+            <ScrollArea className="w-full">
+              <TabsList className="h-auto p-1 flex-wrap whitespace-nowrap">
+                <TabsTrigger value="all" className="text-sm py-1 px-3">
+                  All Categories
                 </TabsTrigger>
-              ))}
-            </TabsList>
-          </ScrollArea>
+                {categories.map(category => (
+                  <TabsTrigger 
+                    key={category} 
+                    value={category}
+                    className="text-sm py-1 px-3"
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </ScrollArea>
+          </div>
           
           {/* Items display */}
           <TabsContent value="all" className="mt-4">
