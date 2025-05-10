@@ -8,6 +8,7 @@ import AddItemDialog from "./menu/AddItemDialog";
 import EditItemDialog from "./menu/EditItemDialog";
 import MenuItemsTable from "./menu/MenuItemsTable";
 import ItemSearch from "./ItemSearch";
+import { ScrollArea } from "./ui/scroll-area";
 
 const MenuTable = () => {
   const {
@@ -52,13 +53,31 @@ const MenuTable = () => {
         <ItemSearch items={items} onSearch={handleSearch} />
       </div>
 
-      <MenuItemsTable
-        items={items}
-        isLoading={isLoading}
-        filteredItems={searchResults}
-        onEditItem={openEditDialog}
-        onDeleteItem={handleDeleteItem}
-      />
+      <div className="mb-2 flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {searchResults.length} {searchResults.length === 1 ? 'item' : 'items'} found
+        </div>
+        
+        {searchResults.length !== items.length && (
+          <Button 
+            variant="link" 
+            className="text-sm h-auto p-0"
+            onClick={() => setSearchResults(items)}
+          >
+            View all items
+          </Button>
+        )}
+      </div>
+
+      <ScrollArea className="h-[calc(100vh-230px)]">
+        <MenuItemsTable
+          items={items}
+          isLoading={isLoading}
+          filteredItems={searchResults}
+          onEditItem={openEditDialog}
+          onDeleteItem={handleDeleteItem}
+        />
+      </ScrollArea>
 
       {/* Add Item Dialog */}
       <AddItemDialog

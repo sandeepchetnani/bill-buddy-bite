@@ -12,7 +12,7 @@ export const useMenuItems = () => {
 
   // Get unique categories for filtering
   const categories = useMemo(() => 
-    Array.from(new Set(items.map(item => item.category))),
+    Array.from(new Set(items.map(item => item.category))).sort(),
     [items]
   );
 
@@ -43,7 +43,9 @@ export const useMenuItems = () => {
     try {
       const { data, error } = await supabase
         .from('menu_items')
-        .select('*');
+        .select('*')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
 
       if (error) {
         toast.error("Failed to fetch menu items");

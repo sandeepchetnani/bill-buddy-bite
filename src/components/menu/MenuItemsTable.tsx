@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell 
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { MenuItem } from "../../data/mockData";
-import { Pencil, Trash, Loader2 } from "lucide-react";
+import { Pencil, Trash, Loader2, ChevronUp, ChevronDown } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 interface MenuItemsTableProps {
   items: MenuItem[];
@@ -15,6 +16,9 @@ interface MenuItemsTableProps {
   onDeleteItem: (id: string) => void;
 }
 
+type SortField = 'name' | 'category' | 'price';
+type SortDirection = 'asc' | 'desc';
+
 const MenuItemsTable: React.FC<MenuItemsTableProps> = ({
   items,
   isLoading,
@@ -22,14 +26,67 @@ const MenuItemsTable: React.FC<MenuItemsTableProps> = ({
   onEditItem,
   onDeleteItem,
 }) => {
+  const [sortField, setSortField] = useState<SortField>('category');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedItems = () => {
+    return [...filteredItems].sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === 'category') {
+        comparison = a.category.localeCompare(b.category);
+      } else if (sortField === 'price') {
+        comparison = a.price - b.price;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  };
+
+  const sortedItems = getSortedItems();
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field) return null;
+    
+    return sortDirection === 'asc' ? 
+      <ChevronUp className="ml-1 h-4 w-4 inline" /> : 
+      <ChevronDown className="ml-1 h-4 w-4 inline" />;
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Price (₹)</TableHead>
+            <TableHead 
+              className="cursor-pointer"
+              onClick={() => handleSort('name')}
+            >
+              Name {renderSortIcon('name')}
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer"
+              onClick={() => handleSort('category')}
+            >
+              Category {renderSortIcon('category')}
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer"
+              onClick={() => handleSort('price')}
+            >
+              Price (₹) {renderSortIcon('price')}
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -43,18 +100,22 @@ const MenuItemsTable: React.FC<MenuItemsTableProps> = ({
                 </div>
               </TableCell>
             </TableRow>
-          ) : filteredItems.length === 0 ? (
+          ) : sortedItems.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className="text-center py-6">
                 No items found
               </TableCell>
             </TableRow>
           ) : (
-            filteredItems.map((item) => (
+            sortedItems.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.category}</TableCell>
-                <TableCell>{item.price}</TableCell>
+                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="font-normal">
+                    {item.category}
+                  </Badge>
+                </TableCell>
+                <TableCell>₹{item.price}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button 
                     variant="outline" 
