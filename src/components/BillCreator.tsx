@@ -8,7 +8,7 @@ import { MenuItem } from '../data/mockData';
 import { formatCurrency } from '../utils/billUtils';
 import BillPreview from './BillPreview';
 import { toast } from "../components/ui/sonner";
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 
 interface BillCreatorProps {
@@ -26,7 +26,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
   const [isCreatingBill, setIsCreatingBill] = useState(false);
   const [isLoadingItems, setIsLoadingItems] = useState(true);
   
-  const { currentItems, finalizeBill, nextBillNumber } = useBill();
+  const { currentItems, finalizeBill, nextBillNumber, removeItem } = useBill();
   
   // Set the default bill number when component mounts or nextBillNumber changes
   useEffect(() => {
@@ -87,6 +87,11 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
     } finally {
       setIsCreatingBill(false);
     }
+  };
+
+  const handleRemoveItem = (itemId: string) => {
+    removeItem(itemId);
+    toast.success("Item removed from bill");
   };
   
   const total = currentItems.reduce(
@@ -182,8 +187,19 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
                           {formatCurrency(item.price)} × {item.quantity}
                         </div>
                       </div>
-                      <div className="font-semibold">
-                        {formatCurrency(item.price * item.quantity)}
+                      <div className="flex items-center gap-2">
+                        <div className="font-semibold">
+                          {formatCurrency(item.price * item.quantity)}
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 rounded-full hover:bg-gray-100"
+                          onClick={() => handleRemoveItem(item.itemId)}
+                          title="Remove item"
+                        >
+                          <X className="h-4 w-4 text-gray-500" />
+                        </Button>
                       </div>
                     </div>
                   ))}
