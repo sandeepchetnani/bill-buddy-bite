@@ -20,7 +20,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
         <TabsList className="h-auto p-1 flex-wrap whitespace-nowrap">
           <TabsTrigger 
             value="all" 
-            className="text-sm py-1 px-3 text-foreground"
+            className="text-sm py-1 px-3 text-black"
           >
             All Categories
           </TabsTrigger>
@@ -28,7 +28,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             <TabsTrigger 
               key={category} 
               value={category}
-              className="text-sm py-1 px-3 text-foreground"
+              className="text-sm py-1 px-3 text-black"
             >
               {category}
             </TabsTrigger>
