@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import ItemSearch from './ItemSearch';
 import ItemsList from './ItemsList';
 import { useBill } from '../context/BillContext';
 import { MenuItem } from '../data/mockData';
@@ -19,7 +18,7 @@ interface BillCreatorProps {
 }
 
 const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, editingId = null }) => {
-  const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [currentBill, setCurrentBill] = useState<any>(null);
@@ -50,7 +49,6 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
             category: item.category
           }));
           setAllMenuItems(transformedItems);
-          setFilteredItems(transformedItems);
         }
       } catch (error) {
         console.error("Error in fetchMenuItems:", error);
@@ -63,10 +61,6 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
     fetchMenuItems();
   }, []);
   
-  const handleSearch = (items: MenuItem[]) => {
-    setFilteredItems(items);
-  };
-
   const handleCreateBill = async () => {
     if (currentItems.length === 0) {
       toast.error("Please add items to the bill first");
@@ -123,10 +117,6 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-            <ItemSearch items={allMenuItems} onSearch={handleSearch} />
-          </div>
-          
           <div className="bg-white rounded-lg shadow-md p-6">
             {isLoadingItems ? (
               <div className="flex justify-center items-center p-12">
@@ -134,7 +124,10 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
                 <span className="ml-2 text-lg">Loading menu items...</span>
               </div>
             ) : (
-              <ItemsList items={filteredItems} />
+              <ItemsList 
+                items={allMenuItems} 
+                showSearchBar={true}
+              />
             )}
           </div>
         </div>

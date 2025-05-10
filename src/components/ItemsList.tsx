@@ -17,9 +17,10 @@ import EmptyState from './items/EmptyState';
 
 interface ItemsListProps {
   items?: MenuItem[];
+  showSearchBar?: boolean;
 }
 
-const ItemsList: React.FC<ItemsListProps> = ({ items: propItems }) => {
+const ItemsList: React.FC<ItemsListProps> = ({ items: propItems, showSearchBar = false }) => {
   const { currentItems, addItem, updateQuantity } = useBill();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,12 +145,14 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems }) => {
   
   return (
     <div className="space-y-6">
-      {/* Search bar */}
-      <SearchBar 
-        searchQuery={searchQuery} 
-        onSearchChange={setSearchQuery} 
-        onClearSearch={handleClearSearch} 
-      />
+      {/* Search bar - only shown when showSearchBar is true */}
+      {showSearchBar && (
+        <SearchBar 
+          searchQuery={searchQuery} 
+          onSearchChange={setSearchQuery} 
+          onClearSearch={handleClearSearch} 
+        />
+      )}
       
       {/* Category tabs */}
       <div>
