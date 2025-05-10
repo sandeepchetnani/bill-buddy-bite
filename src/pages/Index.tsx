@@ -9,13 +9,15 @@ import { Button } from '../components/ui/button';
 import { useBill } from '../context/BillContext';
 import { restaurantInfo } from '../data/mockData';
 import { toast } from "../components/ui/sonner";
-import { History, Menu } from 'lucide-react';
+import { History, LogOut, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const IndexContent = () => {
   const [showBillCreator, setShowBillCreator] = useState(false);
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [showMenuTable, setShowMenuTable] = useState(false);
   const { transactions, isLoading, error, isEditing, cancelEditing, currentEditingId } = useBill();
+  const navigate = useNavigate();
   
   // Show bill creator when in editing mode
   useEffect(() => {
@@ -40,6 +42,12 @@ const IndexContent = () => {
 
   const handleMenuBack = () => {
     setShowMenuTable(false);
+  };
+  
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    toast.success('Logged out successfully');
+    navigate('/login');
   };
 
   // Toggle transaction history view
@@ -109,6 +117,14 @@ const IndexContent = () => {
                 size="lg"
               >
                 Create New Bill
+              </Button>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="flex items-center gap-1"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
               </Button>
             </div>
           </div>
