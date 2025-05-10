@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BillItem, Bill, createBill } from '../utils/billUtils';
 import { Transaction } from '../data/mockData';
@@ -20,6 +21,7 @@ interface BillContextType {
   isEditing: boolean;
   currentEditingId: string | null;
   cancelEditing: () => void;
+  nextBillNumber: string;
 }
 
 const BillContext = createContext<BillContextType | undefined>(undefined);
@@ -31,11 +33,35 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEditingId, setCurrentEditingId] = useState<string | null>(null);
+  const [nextBillNumber, setNextBillNumber] = useState<string>('bill-1');
 
   // Fetch transactions from Supabase when component mounts
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  // Determine next bill number based on existing transactions
+  useEffect(() => {
+    if (transactions.length > 0) {
+      // Find bills with the format "bill-X"
+      const billNumberPattern = /^bill-(\d+)$/;
+      const billNumbers = transactions
+        .map(t => t.billNumber)
+        .filter(bn => billNumberPattern.test(bn))
+        .map(bn => {
+          const match = bn.match(billNumberPattern);
+          return match ? parseInt(match[1], 10) : 0;
+        });
+      
+      // Find the highest bill number
+      const highestBillNumber = billNumbers.length > 0 ? Math.max(...billNumbers) : 0;
+      
+      // Set the next bill number
+      setNextBillNumber(`bill-${highestBillNumber + 1}`);
+    } else {
+      setNextBillNumber('bill-1');
+    }
+  }, [transactions]);
 
   const fetchTransactions = async () => {
     setIsLoading(true);
@@ -106,7 +132,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const finalizeBill = async (customBillNumber?: string): Promise<Bill> => {
-    const newBill = createBill(currentItems, customBillNumber);
+    // Use the automatic bill number if none is provided
+    const billNumberToUse = customBillNumber?.trim() || nextBillNumber;
+    
+    const newBill = createBill(currentItems, billNumberToUse);
     
     // Create a new transaction record to save in Supabase
     const transactionData = {
@@ -163,6 +192,9 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         // Add the new transaction to the beginning of the array
         setTransactions(prev => [newTransaction, ...prev]);
+        
+        // After successful save, update the next bill number
+        setNextBillNumber(`bill-${parseInt(billNumberToUse.split('-')[1], 10) + 1}`);
       }
       
       // Clear current items if not in editing mode
@@ -241,7 +273,8 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       editTransaction,
       isEditing,
       currentEditingId,
-      cancelEditing
+      cancelEditing,
+      nextBillNumber
     }}>
       {children}
     </BillContext.Provider>

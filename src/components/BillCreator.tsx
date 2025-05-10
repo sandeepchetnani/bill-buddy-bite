@@ -26,8 +26,15 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
   const [isCreatingBill, setIsCreatingBill] = useState(false);
   const [isLoadingItems, setIsLoadingItems] = useState(true);
   
-  const { currentItems, finalizeBill } = useBill();
+  const { currentItems, finalizeBill, nextBillNumber } = useBill();
   
+  // Set the default bill number when component mounts or nextBillNumber changes
+  useEffect(() => {
+    if (!isEditing && nextBillNumber) {
+      setCustomBillNumber(nextBillNumber);
+    }
+  }, [isEditing, nextBillNumber]);
+
   // Fetch all menu items from database
   useEffect(() => {
     async function fetchMenuItems() {
@@ -147,7 +154,7 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="billNumber" className="text-sm font-medium">
-                    Bill Number {isEditing ? '(updating)' : '(optional)'}
+                    Bill Number {isEditing ? '(updating)' : ''}
                   </label>
                   <Input
                     id="billNumber"
@@ -156,6 +163,11 @@ const BillCreator: React.FC<BillCreatorProps> = ({ onBack, isEditing = false, ed
                     onChange={(e) => setCustomBillNumber(e.target.value)}
                     className="w-full"
                   />
+                  {!isEditing && (
+                    <p className="text-xs text-muted-foreground">
+                      Using automatic numbering: {nextBillNumber}
+                    </p>
+                  )}
                 </div>
                 
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">

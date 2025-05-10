@@ -48,11 +48,11 @@ export const calculateTotal = (items: BillItem[]): number => {
 };
 
 // Create a new bill
-export const createBill = (items: BillItem[], customBillNumber?: string): Bill => {
+export const createBill = (items: BillItem[], billNumber?: string): Bill => {
   return {
     items,
     total: calculateTotal(items),
-    billNumber: customBillNumber || generateBillNumber(),
+    billNumber: billNumber || generateBillNumber(),
     date: new Date()
   };
 };
