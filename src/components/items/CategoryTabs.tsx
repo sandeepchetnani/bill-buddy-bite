@@ -18,17 +18,14 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
     <div className="relative w-full">
       <ScrollArea className="w-full">
         <TabsList className="h-auto p-1 flex-wrap whitespace-nowrap">
-          <TabsTrigger 
-            value="all" 
-            className="text-sm py-1 px-3 text-foreground"
-          >
+          <TabsTrigger value="all" className="text-sm py-1 px-3">
             All Categories
           </TabsTrigger>
           {categories.map(category => (
             <TabsTrigger 
               key={category} 
               value={category}
-              className="text-sm py-1 px-3 text-foreground"
+              className="text-sm py-1 px-3"
             >
               {category}
             </TabsTrigger>
