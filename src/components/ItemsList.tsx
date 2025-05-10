@@ -2,14 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { MenuItem } from '../data/mockData';
 import { useBill } from '../context/BillContext';
-import { Button } from '../components/ui/button';
-import { formatCurrency } from '../utils/billUtils';
-import { Plus, Minus, Loader2, Search } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { toast } from '../components/ui/sonner';
-import { Input } from './ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { ScrollArea } from './ui/scroll-area';
+import { Tabs, TabsContent } from './ui/tabs';
+
+// Imported smaller components
+import SearchBar from './items/SearchBar';
+import CategoryTabs from './items/CategoryTabs';
+import ItemsByCategory from './items/ItemsByCategory';
+import ItemsByCategoryContent from './items/ItemsByCategoryContent';
+import LoadingState from './items/LoadingState';
+import ErrorState from './items/ErrorState';
+import EmptyState from './items/EmptyState';
 
 interface ItemsListProps {
   items?: MenuItem[];
@@ -127,162 +131,67 @@ const ItemsList: React.FC<ItemsListProps> = ({ items: propItems }) => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-restaurant-primary" />
-        <span className="ml-2 text-lg">Loading menu items...</span>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-red-500">{error}</p>
-        <p className="mt-2">Please try again later or contact support.</p>
-      </div>
-    );
+    return <ErrorState error={error} />;
   }
 
   if (items.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-muted-foreground">No menu items available.</p>
-        <p className="mt-2 text-sm">Please add items in the Menu Management section.</p>
-      </div>
-    );
+    return <EmptyState />;
   }
   
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-muted-foreground" />
-        </div>
-        <Input
-          type="text"
-          placeholder="Search menu items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 w-full"
-        />
-        {searchQuery && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute inset-y-0 right-0 px-3 hover:bg-transparent"
-            onClick={handleClearSearch}
-          >
-            Clear
-          </Button>
-        )}
-      </div>
+      <SearchBar 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery} 
+        onClearSearch={handleClearSearch} 
+      />
       
       {/* Category tabs */}
       <div>
-        <Tabs defaultValue="all" value={selectedTab === null ? 'all' : selectedTab} onValueChange={handleTabChange}>
-          <div className="relative w-full">
-            <ScrollArea className="w-full">
-              <TabsList className="h-auto p-1 flex-wrap whitespace-nowrap">
-                <TabsTrigger value="all" className="text-sm py-1 px-3">
-                  All Categories
-                </TabsTrigger>
-                {categories.map(category => (
-                  <TabsTrigger 
-                    key={category} 
-                    value={category}
-                    className="text-sm py-1 px-3"
-                  >
-                    {category}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </ScrollArea>
-          </div>
+        <Tabs 
+          defaultValue="all" 
+          value={selectedTab === null ? 'all' : selectedTab} 
+          onValueChange={handleTabChange}
+        >
+          <CategoryTabs 
+            categories={categories} 
+            selectedTab={selectedTab} 
+            onTabChange={handleTabChange} 
+          />
           
           {/* Items display */}
           <TabsContent value="all" className="mt-4">
-            {filteredCategories.length > 0 ? (
-              <div className="space-y-6">
-                {filteredCategories.map(category => (
-                  <div key={category} className="space-y-2">
-                    <h3 className="text-lg font-medium text-restaurant-tertiary">{category}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {groupedItems[category].map(renderMenuItem)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center py-6 text-muted-foreground">
-                No items found matching your search.
-              </p>
-            )}
+            <ItemsByCategory
+              groupedItems={groupedItems}
+              filteredCategories={filteredCategories}
+              getQuantity={getQuantity}
+              handleAddItem={handleAddItem}
+              handleIncrement={handleIncrement}
+              handleDecrement={handleDecrement}
+              searchQuery={searchQuery}
+            />
           </TabsContent>
           
           {categories.map(category => (
             <TabsContent key={category} value={category} className="mt-4">
-              {groupedItems[category] && groupedItems[category].length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {groupedItems[category].map(renderMenuItem)}
-                </div>
-              ) : (
-                <p className="text-center py-6 text-muted-foreground">
-                  No items found matching your search.
-                </p>
-              )}
+              <ItemsByCategoryContent
+                items={groupedItems[category] || []}
+                getQuantity={getQuantity}
+                handleAddItem={handleAddItem}
+                handleIncrement={handleIncrement}
+                handleDecrement={handleDecrement}
+              />
             </TabsContent>
           ))}
         </Tabs>
       </div>
     </div>
   );
-  
-  function renderMenuItem(item: MenuItem) {
-    const quantity = getQuantity(item.id);
-    return (
-      <div 
-        key={item.id} 
-        className="border rounded-md p-3 flex justify-between items-center hover:shadow-md transition-shadow"
-      >
-        <div className="flex-1">
-          <h4 className="font-medium">{item.name}</h4>
-          <p className="text-muted-foreground">{formatCurrency(item.price)}</p>
-        </div>
-        
-        {quantity > 0 ? (
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={() => handleDecrement(item)}
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-6 text-center font-medium">{quantity}</span>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={() => handleIncrement(item)}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleAddItem(item)}
-          >
-            Add
-          </Button>
-        )}
-      </div>
-    );
-  }
 };
 
 export default ItemsList;
