@@ -98,7 +98,7 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="absolute inset-y-0 right-0 px-3 hover:bg-transparent"
+            className="absolute inset-y-0 right-0 px-3 hover:bg-transparent text-black"
             onClick={clearFilters}
           >
             <X className="h-4 w-4" />
@@ -113,7 +113,7 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
             <Badge 
               key={category} 
               variant="secondary"
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 text-black"
             >
               {category}
               <X 
@@ -126,7 +126,7 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="text-xs h-6"
+              className="text-xs h-6 text-black"
               onClick={() => setSelectedCategories([])}
             >
               Clear ({selectedCategories.length})
@@ -143,8 +143,8 @@ const ItemSearch: React.FC<ItemSearchProps> = ({ items, onSearch }) => {
               key={category}
               className={`px-3 py-1 text-xs rounded-full border transition-colors h-7 ${
                 selectedCategories.includes(category)
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-background hover:bg-muted"
+                  ? "text-black"
+                  : "bg-background hover:bg-muted text-black"
               }`}
               onClick={() => toggleCategory(category)}
             >
