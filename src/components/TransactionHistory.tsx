@@ -38,7 +38,8 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const groupedByDate = transactions.reduce((acc: Record<string, DailyTotal>, transaction) => {
       // Extract the date part only for grouping (without time)
       const transactionDate = new Date(transaction.date);
-      const dateKey = transactionDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+      // Format as YYYY-MM-DD for consistent grouping
+      const dateKey = transactionDate.toISOString().split('T')[0];
       
       if (!acc[dateKey]) {
         acc[dateKey] = {
@@ -50,7 +51,11 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       }
       
       acc[dateKey].totalAmount += Number(transaction.total);
-      acc[dateKey].transactions.push(transaction);
+      acc[dateKey].transactions.push({
+        ...transaction,
+        // Ensure the date is properly parsed as a Date object
+        date: new Date(transaction.date).toISOString()
+      });
       
       return acc;
     }, {});
