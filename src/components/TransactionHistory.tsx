@@ -168,11 +168,11 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       return;
     }
 
-    // Sort transactions by date and time in descending order (newest first)
+    // Sort transactions by date and time in ascending order
     transactionsToExport.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateB.getTime() - dateA.getTime(); // Descending order (newest first)
+      return dateA.getTime() - dateB.getTime(); // Ascending order
     });
 
     // Calculate total amount
