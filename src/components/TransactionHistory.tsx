@@ -20,7 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from './ui/accordion';
-import { Calendar, ChevronLeft } from 'lucide-react';
+import { Calendar, ChevronLeft, Database } from 'lucide-react';
 
 interface DailyTotal {
   date: string;
@@ -32,6 +32,7 @@ interface DailyTotal {
 const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions } = useBill();
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
+  const [overallTotal, setOverallTotal] = useState<number>(0);
 
   useEffect(() => {
     // Group transactions by date and calculate daily totals
@@ -66,6 +67,10 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
     
     setDailyTotals(sortedDailyTotals);
+    
+    // Calculate overall total
+    const total = transactions.reduce((sum, transaction) => sum + Number(transaction.total), 0);
+    setOverallTotal(total);
   }, [transactions]);
 
   return (
@@ -87,6 +92,24 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <Calendar className="text-restaurant-primary h-6 w-6" />
       </div>
 
+      {/* Overall total display */}
+      <Card className="mb-6 border-2 border-restaurant-primary/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-medium flex items-center">
+            <Database className="h-5 w-5 mr-2 text-restaurant-primary" />
+            Total Revenue
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-3xl font-bold text-restaurant-primary">
+            {formatCurrency(overallTotal)}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Based on {transactions.length} transactions
+          </p>
+        </CardContent>
+      </Card>
+
       {dailyTotals.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
@@ -94,7 +117,7 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
       ) : (
-        <ScrollArea className="h-[calc(100vh-200px)]">
+        <ScrollArea className="h-[calc(100vh-320px)]">
           <Accordion type="single" collapsible className="w-full">
             {dailyTotals.map((dailyTotal, index) => (
               <AccordionItem key={dailyTotal.date} value={dailyTotal.date}>
