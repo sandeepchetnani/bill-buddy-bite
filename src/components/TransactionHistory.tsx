@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { formatDate, formatCurrency } from '../utils/billUtils';
 import { useBill } from '../context/BillContext';
@@ -31,19 +30,8 @@ interface DailyTotal {
 
 // Function to convert date to IST (UTC+5:30)
 const convertToIST = (date: Date): Date => {
-  // Create a new date object for conversion
-  const istDate = new Date(date);
-  
-  // Get UTC time in milliseconds
-  const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
-  
-  // IST is UTC+5:30 (5.5 hours ahead of UTC)
-  const istTime = utcTime + (5.5 * 60 * 60 * 1000);
-  
-  // Set the time to IST
-  istDate.setTime(istTime);
-  
-  return istDate;
+  // Create a new date with IST timezone string
+  return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
 };
 
 // Function to determine business day (4am to next day 4am) in IST
