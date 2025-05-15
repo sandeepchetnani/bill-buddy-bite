@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { formatDate, formatCurrency } from '../utils/billUtils';
 import { useBill } from '../context/BillContext';
@@ -29,39 +28,64 @@ interface DailyTotal {
   formattedDate: string;
 }
 
+// Function to determine business day (4am to next day 4am)
+const getBusinessDay = (date: Date): Date => {
+  const hours = date.getHours();
+  // If time is before 4am, consider it part of the previous day
+  if (hours < 4) {
+    const previousDay = new Date(date);
+    previousDay.setDate(date.getDate() - 1);
+    return previousDay;
+  }
+  return date;
+};
+
+// Format for business day display
+const formatBusinessDay = (date: Date): string => {
+  return date.toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions } = useBill();
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
 
   useEffect(() => {
-    // Group transactions by date and calculate daily totals
-    const groupedByDate = transactions.reduce((acc: Record<string, DailyTotal>, transaction) => {
-      // Extract the date part only for grouping (without time)
+    // Group transactions by business day and calculate daily totals
+    const groupedByBusinessDay = transactions.reduce((acc: Record<string, DailyTotal>, transaction) => {
+      // Convert transaction date to Date object
       const transactionDate = new Date(transaction.date);
-      // Format as YYYY-MM-DD for consistent grouping
-      const dateKey = transactionDate.toISOString().split('T')[0];
+      
+      // Get business day (4am to 4am)
+      const businessDay = getBusinessDay(transactionDate);
+      
+      // Format business day as YYYY-MM-DD for consistent grouping
+      const dateKey = businessDay.toISOString().split('T')[0];
       
       if (!acc[dateKey]) {
         acc[dateKey] = {
           date: dateKey,
           totalAmount: 0,
           transactions: [],
-          formattedDate: formatDate(transactionDate)
+          formattedDate: formatBusinessDay(businessDay)
         };
       }
       
       acc[dateKey].totalAmount += Number(transaction.total);
       acc[dateKey].transactions.push({
         ...transaction,
-        // Ensure the date is properly parsed as a Date object
-        date: new Date(transaction.date).toISOString()
+        // Keep the original date for display within the transaction list
+        date: transaction.date
       });
       
       return acc;
     }, {});
     
     // Convert the object to an array and sort by date (newest first)
-    const sortedDailyTotals = Object.values(groupedByDate).sort(
+    const sortedDailyTotals = Object.values(groupedByBusinessDay).sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     
@@ -96,7 +120,7 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       ) : (
         <ScrollArea className="h-[calc(100vh-200px)]">
           <Accordion type="single" collapsible className="w-full">
-            {dailyTotals.map((dailyTotal, index) => (
+            {dailyTotals.map((dailyTotal) => (
               <AccordionItem key={dailyTotal.date} value={dailyTotal.date}>
                 <AccordionTrigger className="hover:bg-muted/50 px-4">
                   <div className="flex justify-between w-full">

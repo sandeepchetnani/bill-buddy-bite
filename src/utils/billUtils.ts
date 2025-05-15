@@ -1,3 +1,4 @@
+
 import { MenuItem, restaurantInfo } from '../data/mockData';
 import { fuzzySearch } from './fuzzySearch';
 
