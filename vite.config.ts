@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: mode === "production" ? "/bill-buddy-bite/" : "/",
+  base: mode === "production" ? "/" : "/",
   server: {
     host: "::",
     port: 8080,
@@ -20,3 +20,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+//https://sandeepchetnani.github.io/bill-buddy-bite/
