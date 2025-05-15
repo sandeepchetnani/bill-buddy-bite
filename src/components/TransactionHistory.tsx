@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { formatDate, formatCurrency } from '../utils/billUtils';
 import { useBill } from '../context/BillContext';
@@ -168,6 +167,13 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       });
       return;
     }
+
+    // Sort transactions by date and time in ascending order
+    transactionsToExport.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime(); // Ascending order
+    });
 
     // Calculate total amount
     const totalAmount = transactionsToExport.reduce((sum, transaction) => sum + Number(transaction.total), 0);
