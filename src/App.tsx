@@ -10,6 +10,11 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
+// Create a function to get the base URL based on environment
+const getBaseUrl = () => {
+  return import.meta.env.MODE === "production" ? "/bill-buddy-bite/" : "/";
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -18,7 +23,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename={getBaseUrl()}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route 
