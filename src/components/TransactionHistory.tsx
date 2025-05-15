@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { formatDate, formatCurrency } from '../utils/billUtils';
 import { useBill } from '../context/BillContext';
@@ -28,24 +29,46 @@ interface DailyTotal {
   formattedDate: string;
 }
 
-// Function to determine business day (4am to next day 4am)
-const getBusinessDay = (date: Date): Date => {
-  const hours = date.getHours();
-  // If time is before 4am, consider it part of the previous day
-  if (hours < 4) {
-    const previousDay = new Date(date);
-    previousDay.setDate(date.getDate() - 1);
-    return previousDay;
-  }
-  return date;
+// Function to convert date to IST (UTC+5:30)
+const convertToIST = (date: Date): Date => {
+  // Create a new date object for conversion
+  const istDate = new Date(date);
+  
+  // Get UTC time in milliseconds
+  const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
+  
+  // IST is UTC+5:30 (5.5 hours ahead of UTC)
+  const istTime = utcTime + (5.5 * 60 * 60 * 1000);
+  
+  // Set the time to IST
+  istDate.setTime(istTime);
+  
+  return istDate;
 };
 
-// Format for business day display
+// Function to determine business day (4am to next day 4am) in IST
+const getBusinessDay = (date: Date): Date => {
+  // Convert to IST
+  const istDate = convertToIST(date);
+  const hours = istDate.getHours();
+  
+  // If time is before 4am IST, consider it part of the previous day
+  if (hours < 4) {
+    const previousDay = new Date(istDate);
+    previousDay.setDate(istDate.getDate() - 1);
+    return previousDay;
+  }
+  return istDate;
+};
+
+// Format for business day display in IST
 const formatBusinessDay = (date: Date): string => {
+  // We'll format directly using the IST date object
   return date.toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'Asia/Kolkata' // This ensures it's displayed in IST
   });
 };
 
@@ -54,12 +77,12 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
 
   useEffect(() => {
-    // Group transactions by business day and calculate daily totals
+    // Group transactions by business day in IST and calculate daily totals
     const groupedByBusinessDay = transactions.reduce((acc: Record<string, DailyTotal>, transaction) => {
       // Convert transaction date to Date object
       const transactionDate = new Date(transaction.date);
       
-      // Get business day (4am to 4am)
+      // Get business day (4am to 4am) in IST
       const businessDay = getBusinessDay(transactionDate);
       
       // Format business day as YYYY-MM-DD for consistent grouping
@@ -144,9 +167,10 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         <TableRow key={transaction.id}>
                           <TableCell className="font-medium">{transaction.billNumber}</TableCell>
                           <TableCell>
-                            {new Date(transaction.date).toLocaleTimeString([], { 
+                            {new Date(transaction.date).toLocaleTimeString('en-IN', { 
                               hour: '2-digit', 
-                              minute: '2-digit' 
+                              minute: '2-digit',
+                              timeZone: 'Asia/Kolkata' // Display time in IST
                             })}
                           </TableCell>
                           <TableCell className="text-right">{formatCurrency(transaction.total)}</TableCell>
