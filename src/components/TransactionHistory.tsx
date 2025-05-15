@@ -77,8 +77,11 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
 
   useEffect(() => {
+    // Create a Map to ensure unique business days
+    const businessDayMap = new Map<string, DailyTotal>();
+    
     // Group transactions by business day in IST and calculate daily totals
-    const groupedByBusinessDay = transactions.reduce((acc: Record<string, DailyTotal>, transaction) => {
+    transactions.forEach(transaction => {
       // Convert transaction date to Date object
       const transactionDate = new Date(transaction.date);
       
@@ -88,27 +91,26 @@ const TransactionHistory: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       // Format business day as YYYY-MM-DD for consistent grouping
       const dateKey = businessDay.toISOString().split('T')[0];
       
-      if (!acc[dateKey]) {
-        acc[dateKey] = {
+      if (!businessDayMap.has(dateKey)) {
+        businessDayMap.set(dateKey, {
           date: dateKey,
           totalAmount: 0,
           transactions: [],
           formattedDate: formatBusinessDay(businessDay)
-        };
+        });
       }
       
-      acc[dateKey].totalAmount += Number(transaction.total);
-      acc[dateKey].transactions.push({
+      const dailyTotal = businessDayMap.get(dateKey)!;
+      dailyTotal.totalAmount += Number(transaction.total);
+      dailyTotal.transactions.push({
         ...transaction,
         // Keep the original date for display within the transaction list
         date: transaction.date
       });
-      
-      return acc;
-    }, {});
+    });
     
-    // Convert the object to an array and sort by date (newest first)
-    const sortedDailyTotals = Object.values(groupedByBusinessDay).sort(
+    // Convert the Map to an array and sort by date (newest first)
+    const sortedDailyTotals = Array.from(businessDayMap.values()).sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     
