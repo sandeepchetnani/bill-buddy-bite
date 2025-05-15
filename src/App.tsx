@@ -12,16 +12,13 @@ import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
-// Get the base URL from the Vite environment or default to '/'
-const baseUrl = import.meta.env.MODE === "production" ? "/bill-buddy-bite/" : "/";
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename={baseUrl}>
+        <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route 
