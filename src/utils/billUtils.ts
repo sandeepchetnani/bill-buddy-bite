@@ -1,3 +1,4 @@
+
 import { MenuItem, restaurantInfo } from '../data/mockData';
 import { fuzzySearch } from './fuzzySearch';
 
@@ -24,15 +25,16 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-// Format date to a readable string
+// Format date to a readable string in IST
 export const formatDate = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('en-IN', {
+  return d.toLocaleString('en-IN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'Asia/Kolkata' // This ensures it's displayed in IST
   });
 };
 
