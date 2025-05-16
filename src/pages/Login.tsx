@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,15 +21,19 @@ const Login = () => {
   // Check if user is already logged in
   useEffect(() => {
     if (isLoggedIn) {
-      if (isAdmin()) {
-        navigate('/');
-      } else if (isWaiter()) {
-        navigate('/tables');
-      } else if (isKitchen()) {
-        navigate('/kitchen');
-      }
+      redirectLoggedInUser();
     }
-  }, [isLoggedIn, navigate, isAdmin, isWaiter, isKitchen]);
+  }, [isLoggedIn]);
+  
+  const redirectLoggedInUser = () => {
+    if (isAdmin()) {
+      navigate('/');
+    } else if (isWaiter()) {
+      navigate('/tables');
+    } else if (isKitchen()) {
+      navigate('/kitchen');
+    }
+  };
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +45,7 @@ const Login = () => {
       
       if (success) {
         toast.success('Login successful!');
-        if (isAdmin()) {
-          navigate('/');
-        } else if (isWaiter()) {
-          navigate('/tables');
-        } else if (isKitchen()) {
-          navigate('/kitchen');
-        }
+        redirectLoggedInUser();
       } else {
         setError('Invalid username or password');
         toast.error('Login failed');

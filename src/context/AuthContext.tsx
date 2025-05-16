@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types/waiter';
 
@@ -74,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Check kitchen credentials
-    if (username === KITCHEN_CREDENTIALS.username && password === KITCHEN_CREDENTIALS.password) {
+    if (username.toLowerCase() === KITCHEN_CREDENTIALS.username.toLowerCase() && password === KITCHEN_CREDENTIALS.password) {
       const kitchenUser: User = {
         id: '3',
         name: 'Kitchen',
