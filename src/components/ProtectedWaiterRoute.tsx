@@ -8,13 +8,14 @@ interface ProtectedWaiterRouteProps {
 }
 
 const ProtectedWaiterRoute: React.FC<ProtectedWaiterRouteProps> = ({ children }) => {
-  const { isLoggedIn, isWaiter } = useAuth();
+  const { isLoggedIn, isWaiter, isAdmin } = useAuth();
   
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
   
-  if (!isWaiter()) {
+  // Allow both admin and waiter roles to access
+  if (!isWaiter() && !isAdmin()) {
     return <Navigate to="/" replace />;
   }
   
