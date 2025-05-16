@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Printer, Eye } from 'lucide-react';
+import { ArrowLeft, Printer, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { formatCurrency } from '../utils/billUtils';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -15,6 +15,17 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { restaurantInfo } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 
@@ -40,6 +51,7 @@ const OrdersAdmin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   
@@ -67,6 +79,32 @@ const OrdersAdmin: React.FC = () => {
       toast.error('Failed to fetch orders');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      setDeletingId(orderId);
+      
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+        
+      if (error) {
+        console.error('Error deleting order:', error);
+        toast.error('Failed to delete order');
+        return;
+      }
+      
+      // Remove the deleted order from state
+      setOrders(prev => prev.filter(order => order.id !== orderId));
+      toast.success('Order deleted successfully');
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast.error('Failed to delete order');
+    } finally {
+      setDeletingId(null);
     }
   };
   
@@ -163,6 +201,49 @@ const OrdersAdmin: React.FC = () => {
                               <Printer className="h-4 w-4 mr-2" />
                               Print
                             </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="text-red-500 hover:text-red-600 hover:border-red-300"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Order</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete order {order.order_number}?
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteOrder(order.id);
+                                    }}
+                                    className="bg-red-500 hover:bg-red-600"
+                                  >
+                                    {deletingId === order.id ? (
+                                      <span className="flex items-center">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Deleting...
+                                      </span>
+                                    ) : (
+                                      "Delete"
+                                    )}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </TableCell>
                       </TableRow>
