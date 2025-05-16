@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '../integrations/supabase/client';
 import { BillItem } from '../utils/billUtils';
 import { formatCurrency } from '../utils/billUtils';
+import { Json } from '../integrations/supabase/types';
 
 interface Order {
   id: string;
@@ -22,6 +23,30 @@ interface Order {
   created_at: string;
   status: string;
 }
+
+// Helper function to convert Json to BillItem[]
+const convertJsonToBillItems = (jsonItems: Json): BillItem[] => {
+  if (!jsonItems || typeof jsonItems !== 'object') {
+    return [];
+  }
+  
+  try {
+    // Handle the case where jsonItems might already be an array
+    if (Array.isArray(jsonItems)) {
+      return jsonItems as BillItem[];
+    }
+    
+    // If it's a string (JSON string), try to parse it
+    if (typeof jsonItems === 'string') {
+      return JSON.parse(jsonItems);
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error converting JSON to BillItems:', error);
+    return [];
+  }
+};
 
 const Kitchen = () => {
   const navigate = useNavigate();
@@ -47,7 +72,13 @@ const Kitchen = () => {
           table: 'orders' 
         }, 
         (payload) => {
-          const newOrder = payload.new as Order;
+          const newOrderData = payload.new as any;
+          // Convert JSON items to BillItem[]
+          const newOrder: Order = {
+            ...newOrderData,
+            items: convertJsonToBillItems(newOrderData.items)
+          };
+          
           // Add the new order and play notification sound
           setOrders(prevOrders => {
             // Check if we actually have a new order that's not already in the list
@@ -83,7 +114,13 @@ const Kitchen = () => {
         throw error;
       }
       
-      setOrders(data || []);
+      // Convert JSON items to BillItem[] for each order
+      const ordersWithBillItems: Order[] = (data || []).map(order => ({
+        ...order,
+        items: convertJsonToBillItems(order.items)
+      }));
+      
+      setOrders(ordersWithBillItems);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to fetch orders');
