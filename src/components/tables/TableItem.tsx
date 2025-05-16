@@ -14,15 +14,18 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
   const navigate = useNavigate();
   
   const handleTableClick = () => {
+    // First select the table in context
     selectTable(table);
+    // Then navigate to the order page
     navigate('/order');
+    console.log(`Selected table ${table.id} and navigating to order page`);
   };
   
   return (
-    <button
+    <div
       onClick={handleTableClick}
       className={cn(
-        "h-24 w-full border rounded-md flex flex-col items-center justify-center transition-colors",
+        "h-24 w-full border rounded-md flex flex-col items-center justify-center transition-colors cursor-pointer",
         table.occupied 
           ? "bg-amber-100 border-amber-300" 
           : "bg-green-50 border-green-200 hover:bg-green-100",
@@ -40,7 +43,7 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
             ? "Occupied" 
             : "Available"}
       </span>
-    </button>
+    </div>
   );
 };
 

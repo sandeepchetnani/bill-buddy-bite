@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { TablesProvider } from '../context/TablesContext';
+import { TablesProvider, useTables } from '../context/TablesContext';
 import TableGrid from '../components/tables/TableGrid';
 import { restaurantInfo } from '../data/mockData';
 import { toast } from '@/components/ui/sonner';
