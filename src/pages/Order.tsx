@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Save } from 'lucide-react';
 import { useTables, TablesProvider } from '../context/TablesContext';
 import OrderItems from '../components/order/OrderItems';
 import MenuItemSelection from '../components/order/MenuItemSelection';
@@ -14,6 +14,7 @@ const OrderContent = () => {
   const { currentTable, tableItems, clearCurrentTable, completeOrder } = useTables();
   const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
     // Redirect if no table is selected
@@ -43,8 +44,16 @@ const OrderContent = () => {
       return;
     }
     
-    await completeOrder();
-    navigate('/tables');
+    setIsSubmitting(true);
+    
+    try {
+      await completeOrder();
+      navigate('/tables');
+    } catch (error) {
+      console.error('Error completing order:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   if (!currentTable) {
@@ -95,10 +104,10 @@ const OrderContent = () => {
                 <Button 
                   className="w-full mt-4 bg-restaurant-primary hover:bg-restaurant-secondary"
                   onClick={handleCompleteOrder}
-                  disabled={tableItems[currentTable.id]?.length === 0}
+                  disabled={isSubmitting || tableItems[currentTable.id]?.length === 0}
                 >
                   <ShoppingBag className="mr-2 h-4 w-4" />
-                  Complete Order
+                  {isSubmitting ? 'Saving...' : 'Complete Order'}
                 </Button>
               </div>
             </div>

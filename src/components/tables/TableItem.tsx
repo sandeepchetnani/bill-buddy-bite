@@ -12,15 +12,19 @@ import {
   SheetDescription
 } from '@/components/ui/sheet';
 import MenuItemSelection from '@/components/order/MenuItemSelection';
+import { Button } from '@/components/ui/button';
+import { Check, ArrowRight } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
 
 interface TableItemProps {
   table: Table;
 }
 
 const TableItem: React.FC<TableItemProps> = ({ table }) => {
-  const { selectTable } = useTables();
+  const { selectTable, tableItems, completeOrder } = useTables();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const handleTableClick = () => {
     // First select the table in context
@@ -34,6 +38,29 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
     // Close the sheet and navigate to the order page for more detailed ordering
     setIsMenuOpen(false);
     navigate('/order');
+  };
+  
+  const handleSaveQuickOrder = async () => {
+    if (!table) return;
+    
+    // Check if there are any items to save
+    const items = tableItems[table.id] || [];
+    if (items.length === 0) {
+      toast.error('No items to save');
+      return;
+    }
+    
+    try {
+      setIsSaving(true);
+      await completeOrder();
+      toast.success(`Order saved for Table ${table.block}${table.number}`);
+      setIsMenuOpen(false);
+    } catch (error) {
+      console.error('Error saving order:', error);
+      toast.error('Failed to save order');
+    } finally {
+      setIsSaving(false);
+    }
   };
   
   return (
@@ -74,13 +101,24 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
           <div className="mt-6 space-y-6">
             <MenuItemSelection />
             
-            <div className="pt-4 border-t flex justify-end">
-              <button 
+            <div className="pt-4 border-t flex justify-between">
+              <Button 
+                onClick={handleSaveQuickOrder}
+                variant="outline"
+                disabled={isSaving}
+                className="flex items-center gap-2"
+              >
+                <Check className="h-4 w-4" />
+                Save & Complete Order
+              </Button>
+              <Button 
                 onClick={handleCompleteOrder}
-                className="px-4 py-2 bg-restaurant-primary text-white rounded-md hover:bg-restaurant-secondary"
+                variant="default"
+                className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center gap-2"
               >
                 Go to Detailed Order
-              </button>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </SheetContent>

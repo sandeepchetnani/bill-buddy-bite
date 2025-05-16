@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Table, TableBlock, TableNumber } from '../types/waiter';
 import { BillItem } from '../utils/billUtils';
 import { toast } from '@/components/ui/sonner';
@@ -18,6 +19,8 @@ interface TablesContextType {
   completeOrder: () => Promise<void>;
   getTableItems: (tableId: string) => BillItem[];
 }
+
+const TABLES_STORAGE_KEY = 'restaurant-table-items';
 
 const generateTables = (): Table[] => {
   const blocks: TableBlock[] = ['A', 'B', 'C', 'D', 'E'];
@@ -48,6 +51,37 @@ export const TablesProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [tables, setTables] = useState<Table[]>(generateTables());
   const [currentTable, setCurrentTable] = useState<Table | null>(null);
   const [tableItems, setTableItems] = useState<Record<string, BillItem[]>>({});
+  
+  // Load table items from localStorage on component mount
+  useEffect(() => {
+    const storedItems = localStorage.getItem(TABLES_STORAGE_KEY);
+    
+    if (storedItems) {
+      try {
+        const parsedItems = JSON.parse(storedItems);
+        setTableItems(parsedItems);
+        
+        // Update tables status based on stored items
+        setTables(prev => 
+          prev.map(table => {
+            const hasItems = parsedItems[table.id] && parsedItems[table.id].length > 0;
+            return {
+              ...table, 
+              orderInProgress: hasItems,
+              occupied: hasItems
+            };
+          })
+        );
+      } catch (error) {
+        console.error('Failed to parse stored table items:', error);
+      }
+    }
+  }, []);
+  
+  // Save table items to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(TABLES_STORAGE_KEY, JSON.stringify(tableItems));
+  }, [tableItems]);
   
   const selectTable = (table: Table) => {
     setCurrentTable(table);
