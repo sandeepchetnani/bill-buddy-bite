@@ -6,11 +6,22 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Tables from "./pages/Tables";
+import Order from "./pages/Order";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedWaiterRoute from "./components/ProtectedWaiterRoute";
 import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
+
+// Get the base URL based on environment
+const getBaseUrl = () => {
+  if (import.meta.env.MODE === 'production') {
+    return '/bill-buddy-bite/';
+  }
+  return '/';
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -18,7 +29,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename={getBaseUrl()}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route 
@@ -27,6 +38,22 @@ const App = () => (
                 <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/tables" 
+              element={
+                <ProtectedWaiterRoute>
+                  <Tables />
+                </ProtectedWaiterRoute>
+              } 
+            />
+            <Route 
+              path="/order" 
+              element={
+                <ProtectedWaiterRoute>
+                  <Order />
+                </ProtectedWaiterRoute>
               } 
             />
             <Route path="*" element={<NotFound />} />

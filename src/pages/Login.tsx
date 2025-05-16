@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 import { restaurantInfo } from '../data/mockData';
 import { Lock, User } from 'lucide-react';
-
-// Define our static credentials
-const STATIC_USERNAME = "thebasefour";
-const STATIC_PASSWORD = "thebasefour98";
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -20,36 +17,46 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
-  const location = useLocation();
+  const { login, isLoggedIn, isAdmin, isWaiter } = useAuth();
   
   // Check if user is already logged in
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
-      navigate('/');
+      if (isAdmin()) {
+        navigate('/');
+      } else if (isWaiter()) {
+        navigate('/tables');
+      }
     }
-  }, [navigate]);
+  }, [isLoggedIn, navigate, isAdmin, isWaiter]);
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoggingIn(true);
     
-    // Simulate network delay
-    setTimeout(() => {
-      if (username === STATIC_USERNAME && password === STATIC_PASSWORD) {
-        // Set logged in state
-        localStorage.setItem('isLoggedIn', 'true');
+    try {
+      const success = await login(username, password);
+      
+      if (success) {
         toast.success('Login successful!');
-        navigate('/');
+        if (isAdmin()) {
+          navigate('/');
+        } else if (isWaiter()) {
+          navigate('/tables');
+        }
       } else {
         setError('Invalid username or password');
         toast.error('Login failed');
       }
+    } catch (err) {
+      setError('An error occurred during login');
+      toast.error('Login failed');
+    } finally {
       setIsLoggingIn(false);
-    }, 800);
+    }
   };
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
@@ -58,7 +65,7 @@ const Login = () => {
             {restaurantInfo.name}
           </CardTitle>
           <CardDescription>
-            Enter your credentials to access the billing system
+            Enter your credentials to access the system
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
@@ -96,6 +103,11 @@ const Login = () => {
                   required
                 />
               </div>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p>Demo credentials:</p>
+              <p>Admin: thebasefour / thebasefour98</p>
+              <p>Waiter: waiter / waiter123</p>
             </div>
           </CardContent>
           <CardFooter>
