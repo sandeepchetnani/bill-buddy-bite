@@ -21,7 +21,7 @@ const TableGrid = () => {
   const blocks: TableBlockType[] = ['A', 'B', 'C', 'D', 'E'];
   
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {blocks.map(block => (
         <TableBlock 
           key={block} 

@@ -58,10 +58,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-2 sm:px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold text-restaurant-primary">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-restaurant-primary">
             {restaurantInfo.name}
           </CardTitle>
           <CardDescription>
@@ -69,16 +69,16 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+              <div className="bg-red-50 text-red-600 p-3 rounded-md text-xs sm:text-sm">
                 {error}
               </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="username"
                   placeholder="Enter username"
@@ -92,7 +92,7 @@ const Login = () => {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
                   type="password"
@@ -104,7 +104,7 @@ const Login = () => {
                 />
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground bg-gray-50 p-2 rounded">
               <p>Demo credentials:</p>
               <p>Admin: thebasefour / thebasefour98</p>
               <p>Waiter: waiter / waiter123</p>

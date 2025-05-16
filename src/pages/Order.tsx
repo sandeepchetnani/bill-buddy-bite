@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShoppingBag, Save } from 'lucide-react';
+import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useTables, TablesProvider } from '../context/TablesContext';
 import OrderItems from '../components/order/OrderItems';
 import MenuItemSelection from '../components/order/MenuItemSelection';
@@ -62,20 +62,20 @@ const OrderContent = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container max-w-7xl mx-auto py-4 px-4">
-        <Button onClick={handleBack} variant="outline" className="mb-4">
+      <div className="container max-w-7xl mx-auto py-3 px-2 sm:py-4 sm:px-4">
+        <Button onClick={handleBack} variant="outline" className="mb-3 sm:mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Tables
         </Button>
         
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
           {/* Left side: Menu */}
-          <div className="w-full md:w-7/12 lg:w-8/12">
-            <div className="bg-white rounded-lg shadow p-4 mb-4">
-              <h2 className="text-xl font-bold mb-2">
+          <div className="w-full lg:w-7/12">
+            <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">
                 Table {currentTable.block}{currentTable.number} - Order
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Select items from the menu below to add to this order
               </p>
             </div>
@@ -84,11 +84,11 @@ const OrderContent = () => {
           </div>
           
           {/* Right side: Current Order */}
-          <div className="w-full md:w-5/12 lg:w-4/12">
-            <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Current Order</h2>
-                <span className="text-sm text-muted-foreground">
+          <div className="w-full lg:w-5/12">
+            <div className="bg-white rounded-lg shadow p-3 sm:p-4 sticky top-4">
+              <div className="flex justify-between items-center mb-3 sm:mb-4">
+                <h2 className="text-base sm:text-lg font-semibold">Current Order</h2>
+                <span className="text-xs sm:text-sm text-muted-foreground">
                   Table {currentTable.block}{currentTable.number}
                 </span>
               </div>

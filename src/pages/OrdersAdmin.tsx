@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -132,8 +133,8 @@ const OrdersAdmin: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
-      <div className="container max-w-7xl mx-auto py-6 px-4">
-        <div className="flex justify-between items-center mb-6">
+      <div className="container max-w-7xl mx-auto py-4 px-2 sm:px-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
           <div className="flex items-center gap-2">
             <Button 
               onClick={handleBackButtonClick}
@@ -143,7 +144,7 @@ const OrdersAdmin: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back {isAdmin() ? 'to Home' : 'to Tables'}
             </Button>
-            <h1 className="text-2xl font-bold">Orders Management</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Orders</h1>
           </div>
           <Button onClick={fetchOrders} variant="outline" size="sm">
             Refresh
@@ -151,8 +152,8 @@ const OrdersAdmin: React.FC = () => {
         </div>
         
         <Card>
-          <CardHeader>
-            <CardTitle>Completed Orders</CardTitle>
+          <CardHeader className="py-4">
+            <CardTitle className="text-lg sm:text-xl">Completed Orders</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -162,15 +163,15 @@ const OrdersAdmin: React.FC = () => {
                 No orders found
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Order #</TableHead>
-                      <TableHead>Table</TableHead>
-                      <TableHead>Items</TableHead>
+                      <TableHead className="w-[80px]">Order #</TableHead>
+                      <TableHead className="w-[80px]">Table</TableHead>
+                      <TableHead className="hidden sm:table-cell">Items</TableHead>
                       <TableHead>Total</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead className="hidden md:table-cell">Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -179,31 +180,32 @@ const OrdersAdmin: React.FC = () => {
                       <TableRow key={order.id}>
                         <TableCell className="font-medium">{order.order_number}</TableCell>
                         <TableCell>{`${order.table_block}${order.table_number}`}</TableCell>
-                        <TableCell>{order.items.reduce((sum, item) => sum + item.quantity, 0)} items</TableCell>
+                        <TableCell className="hidden sm:table-cell">{order.items.reduce((sum, item) => sum + item.quantity, 0)} items</TableCell>
                         <TableCell>{formatCurrency(order.total)}</TableCell>
-                        <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
+                        <TableCell className="hidden md:table-cell">{new Date(order.created_at).toLocaleDateString()}</TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1 sm:gap-2">
                             <Button 
                               variant="outline" 
                               size="sm" 
                               onClick={() => handleViewOrder(order)}
+                              className="h-8 px-2 sm:px-3"
                             >
-                              <Eye className="h-4 w-4 mr-2" />
-                              View
+                              <Eye className="h-3 w-3 sm:mr-1" />
+                              <span className="hidden sm:inline">View</span>
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button 
                                   variant="outline" 
                                   size="sm"
-                                  className="text-red-500 hover:text-red-600 hover:border-red-300"
+                                  className="h-8 px-2 sm:px-3 text-red-500 hover:text-red-600 hover:border-red-300"
                                 >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
+                                  <Trash2 className="h-3 w-3 sm:mr-1" />
+                                  <span className="hidden sm:inline">Delete</span>
                                 </Button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent>
+                              <AlertDialogContent className="sm:max-w-md">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Delete Order</AlertDialogTitle>
                                   <AlertDialogDescription>
@@ -248,9 +250,9 @@ const OrdersAdmin: React.FC = () => {
         
         {/* View Order Dialog - Styled similar to BillPreview */}
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-center text-2xl font-bold">
+              <DialogTitle className="text-center text-xl sm:text-2xl font-bold">
                 {restaurantInfo.name}
               </DialogTitle>
               <div className="text-center text-sm text-muted-foreground">
@@ -260,9 +262,9 @@ const OrdersAdmin: React.FC = () => {
             </DialogHeader>
             
             <div className="border-t border-b py-4">
-              <div className="flex justify-between mb-2">
+              <div className="flex justify-between mb-2 flex-wrap gap-1">
                 <span className="font-semibold">Order #{selectedOrder?.order_number}</span>
-                <span className="text-muted-foreground">
+                <span className="text-muted-foreground text-xs sm:text-sm">
                   {selectedOrder ? new Date(selectedOrder.created_at).toLocaleString() : ''}
                 </span>
               </div>
@@ -274,25 +276,25 @@ const OrdersAdmin: React.FC = () => {
                     className="flex justify-between items-center border-b pb-2 last:border-0"
                   >
                     <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-medium text-sm sm:text-base">{item.name}</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         {formatCurrency(item.price)} × {item.quantity}
                       </div>
                     </div>
-                    <span className="font-semibold">
+                    <span className="font-semibold text-sm sm:text-base">
                       {formatCurrency(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
               </div>
               
-              <div className="mt-4 flex justify-between text-lg font-bold">
+              <div className="mt-4 flex justify-between text-base sm:text-lg font-bold">
                 <span>Total</span>
                 <span>{selectedOrder ? formatCurrency(selectedOrder.total) : ''}</span>
               </div>
             </div>
 
-            <div className="text-center mt-2 text-sm text-muted-foreground">
+            <div className="text-center mt-2 text-xs sm:text-sm text-muted-foreground">
               <p>Thank you for dining with us!</p>
               <p>Table {selectedOrder?.table_block}{selectedOrder?.table_number}</p>
             </div>

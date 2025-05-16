@@ -31,7 +31,6 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
     selectTable(table);
     // Open the menu sheet
     setIsMenuOpen(true);
-    console.log(`Selected table ${table.id} and opening menu sheet`);
   };
 
   const handleCompleteOrder = () => {
@@ -68,16 +67,16 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
       <div
         onClick={handleTableClick}
         className={cn(
-          "h-24 w-full border rounded-md flex flex-col items-center justify-center transition-colors cursor-pointer",
+          "h-20 sm:h-24 w-full border rounded-md flex flex-col items-center justify-center transition-colors cursor-pointer",
           table.occupied 
             ? "bg-amber-100 border-amber-300" 
             : "bg-green-50 border-green-200 hover:bg-green-100",
           table.orderInProgress && "ring-2 ring-blue-400"
         )}
       >
-        <span className="text-xl font-bold">Table {table.block}{table.number}</span>
+        <span className="text-lg sm:text-xl font-bold">Table {table.block}{table.number}</span>
         <span className={cn(
-          "text-sm mt-1",
+          "text-xs sm:text-sm mt-1",
           table.occupied ? "text-amber-700" : "text-green-700"
         )}>
           {table.orderInProgress 
@@ -90,21 +89,21 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
 
       {/* Menu Sheet that opens when table is clicked */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg p-3 sm:p-6 overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Table {table.block}{table.number} - Quick Order</SheetTitle>
-            <SheetDescription>
+            <SheetTitle className="text-lg sm:text-xl">Table {table.block}{table.number} - Quick Order</SheetTitle>
+            <SheetDescription className="text-xs sm:text-sm">
               Add items to this table or proceed to detailed order page
             </SheetDescription>
           </SheetHeader>
           
           {/* Move the save & complete button to the top */}
-          <div className="mt-4 mb-6 flex justify-between">
+          <div className="mt-4 mb-6 flex flex-col sm:flex-row gap-2 sm:justify-between">
             <Button 
               onClick={handleSaveQuickOrder}
               variant="outline"
               disabled={isSaving}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2"
             >
               <Check className="h-4 w-4" />
               Save & Complete Order
@@ -112,7 +111,7 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
             <Button 
               onClick={handleCompleteOrder}
               variant="default"
-              className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center gap-2"
+              className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center justify-center gap-2"
             >
               Go to Detailed Order
               <ArrowRight className="h-4 w-4" />

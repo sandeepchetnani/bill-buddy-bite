@@ -22,13 +22,13 @@ const TablesContent = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container max-w-5xl mx-auto py-6 px-4 sm:px-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="container max-w-5xl mx-auto py-4 px-2 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center mb-4 sm:mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-restaurant-primary">
-              {restaurantInfo.name} - Table Management
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-restaurant-primary">
+              {restaurantInfo.name}
             </h1>
-            <p className="text-muted-foreground">Select a table to create or manage orders</p>
+            <p className="text-sm text-muted-foreground">Select a table to create or manage orders</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -51,7 +51,7 @@ const TablesContent = () => {
         </div>
         
         <Card>
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-3 md:p-6">
             <TableGrid />
           </CardContent>
         </Card>
