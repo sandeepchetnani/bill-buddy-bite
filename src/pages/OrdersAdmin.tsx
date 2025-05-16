@@ -1,9 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Printer, Eye, Trash2 } from 'lucide-react';
+import { ArrowLeft, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { formatCurrency } from '../utils/billUtils';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -192,14 +191,6 @@ const OrdersAdmin: React.FC = () => {
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               View
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handlePrintOrder(order)}
-                            >
-                              <Printer className="h-4 w-4 mr-2" />
-                              Print
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
