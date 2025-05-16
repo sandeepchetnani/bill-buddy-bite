@@ -113,9 +113,22 @@ export const TablesProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const tableId = currentTable.id;
       const items = prev[tableId] || [];
       
+      const updatedItems = items.filter(item => item.itemId !== itemId);
+      
+      // Check if this was the last item and update table status if needed
+      if (updatedItems.length === 0) {
+        setTables(prevTables => 
+          prevTables.map(t => 
+            t.id === tableId 
+              ? { ...t, orderInProgress: false, occupied: false } 
+              : t
+          )
+        );
+      }
+      
       return {
         ...prev,
-        [tableId]: items.filter(item => item.itemId !== itemId)
+        [tableId]: updatedItems
       };
     });
   };
