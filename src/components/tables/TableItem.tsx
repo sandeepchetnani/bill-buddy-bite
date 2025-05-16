@@ -25,9 +25,9 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
   const handleTableClick = () => {
     // First select the table in context
     selectTable(table);
-    // Open the menu sheet instead of navigating
+    // Open the menu sheet
     setIsMenuOpen(true);
-    console.log(`Selected table ${table.id} and opening menu`);
+    console.log(`Selected table ${table.id} and opening menu sheet`);
   };
 
   const handleCompleteOrder = () => {
@@ -63,7 +63,7 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
 
       {/* Menu Sheet that opens when table is clicked */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <SheetContent className="w-full sm:max-w-md md:max-w-lg overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Table {table.block}{table.number} - Quick Order</SheetTitle>
             <SheetDescription>
