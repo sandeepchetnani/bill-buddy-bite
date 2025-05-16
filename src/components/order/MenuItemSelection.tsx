@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Plus } from 'lucide-react';
 import { formatCurrency } from '../../utils/billUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LoadingState } from '../items/LoadingState';
+import LoadingState from '../items/LoadingState';
 
 const MenuItemSelection = () => {
   const { isLoading, items, categories } = useMenuItems();
