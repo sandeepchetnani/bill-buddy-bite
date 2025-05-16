@@ -37,14 +37,6 @@ const App = () => (
               path="/" 
               element={
                 <ProtectedRoute>
-                  <Navigate to="/orders-admin" replace />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/index" 
-              element={
-                <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
               } 
@@ -68,9 +60,9 @@ const App = () => (
             <Route 
               path="/orders-admin" 
               element={
-                <ProtectedRoute>
+                <ProtectedWaiterRoute>
                   <OrdersAdmin />
-                </ProtectedRoute>
+                </ProtectedWaiterRoute>
               } 
             />
             <Route path="*" element={<NotFound />} />

@@ -23,7 +23,7 @@ const Login = () => {
   useEffect(() => {
     if (isLoggedIn) {
       if (isAdmin()) {
-        navigate('/orders-admin');
+        navigate('/');
       } else if (isWaiter()) {
         navigate('/tables');
       }
@@ -41,7 +41,7 @@ const Login = () => {
       if (success) {
         toast.success('Login successful!');
         if (isAdmin()) {
-          navigate('/orders-admin');
+          navigate('/');
         } else if (isWaiter()) {
           navigate('/tables');
         }

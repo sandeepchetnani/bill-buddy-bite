@@ -18,7 +18,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/tables" replace />;
   }
   
-  // Admin stays on the intended route
   return <>{children}</>;
 };
 
