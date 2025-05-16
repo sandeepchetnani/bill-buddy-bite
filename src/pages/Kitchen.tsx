@@ -91,27 +91,31 @@ const Kitchen = () => {
         }, 
         (payload) => {
           const newOrderData = payload.new as any;
-          // Convert JSON items to BillItem[]
-          const newOrder: Order = {
-            ...newOrderData,
-            items: convertJsonToBillItems(newOrderData.items)
-          };
           
-          // Add the new order and play notification sound
-          setOrders(prevOrders => {
-            // Check if we actually have a new order that's not already in the list
-            const isNewOrder = !prevOrders.some(order => order.id === newOrder.id);
+          // Only process if the order is 'inprogress'
+          if (newOrderData.status === 'inprogress') {
+            // Convert JSON items to BillItem[]
+            const newOrder: Order = {
+              ...newOrderData,
+              items: convertJsonToBillItems(newOrderData.items)
+            };
             
-            if (isNewOrder) {
-              setNewOrderAlert(true);
-              if (notificationSound.current) {
-                notificationSound.current.play().catch(e => console.error("Error playing notification sound:", e));
+            // Add the new order and play notification sound
+            setOrders(prevOrders => {
+              // Check if we actually have a new order that's not already in the list
+              const isNewOrder = !prevOrders.some(order => order.id === newOrder.id);
+              
+              if (isNewOrder) {
+                setNewOrderAlert(true);
+                if (notificationSound.current) {
+                  notificationSound.current.play().catch(e => console.error("Error playing notification sound:", e));
+                }
+                toast.success(`New order from Table ${newOrder.table_block}${newOrder.table_number}`);
+                return [newOrder, ...prevOrders];
               }
-              toast.success(`New order from Table ${newOrder.table_block}${newOrder.table_number}`);
-              return [newOrder, ...prevOrders];
-            }
-            return prevOrders;
-          });
+              return prevOrders;
+            });
+          }
         })
       .subscribe();
     
@@ -126,6 +130,7 @@ const Kitchen = () => {
       const { data, error } = await supabase
         .from('orders')
         .select('*')
+        .eq('status', 'inprogress') // Only fetch 'inprogress' orders
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -182,7 +187,7 @@ const Kitchen = () => {
               Kitchen Orders
             </h1>
             <p className="text-sm text-muted-foreground">
-              View and manage incoming orders
+              View and manage in-progress orders
             </p>
           </div>
           <Button
@@ -212,7 +217,7 @@ const Kitchen = () => {
           {orders.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-10">
-                <p className="text-muted-foreground">No orders to display</p>
+                <p className="text-muted-foreground">No in-progress orders to display</p>
               </CardContent>
             </Card>
           ) : (
