@@ -4,6 +4,7 @@ import { BillItem } from '../utils/billUtils';
 import { toast } from '@/components/ui/sonner';
 import { MenuItem } from '../data/mockData';
 import { supabase } from '../integrations/supabase/client';
+import { Json } from '../integrations/supabase/types';
 
 interface TablesContextType {
   tables: Table[];
@@ -174,12 +175,15 @@ export const TablesProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Generate order number (timestamp-based)
       const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
       
+      // Convert BillItem[] to Json compatible type
+      const itemsJson = JSON.parse(JSON.stringify(items)) as Json;
+      
       // Save order to database
       const { error } = await supabase.from('orders').insert({
         table_id: currentTable.id,
         table_block: currentTable.block,
         table_number: currentTable.number,
-        items: items,
+        items: itemsJson,
         total: total,
         order_number: orderNumber
       });
