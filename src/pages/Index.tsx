@@ -9,7 +9,7 @@ import { Button } from '../components/ui/button';
 import { useBill } from '../context/BillContext';
 import { restaurantInfo } from '../data/mockData';
 import { toast } from "../components/ui/sonner";
-import { History, LogOut, Menu } from 'lucide-react';
+import { ClipboardList, History, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const IndexContent = () => {
@@ -48,6 +48,11 @@ const IndexContent = () => {
     localStorage.removeItem('isLoggedIn');
     toast.success('Logged out successfully');
     navigate('/login');
+  };
+
+  // Navigate to Orders Admin page
+  const navigateToOrdersAdmin = () => {
+    navigate('/orders-admin');
   };
 
   // Toggle transaction history view
@@ -95,6 +100,14 @@ const IndexContent = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={navigateToOrdersAdmin}
+                variant="outline"
+                className="flex items-center gap-1"
+              >
+                <ClipboardList className="h-4 w-4" />
+                Order Management
+              </Button>
               <Button
                 onClick={toggleMenuTable}
                 variant="outline"
