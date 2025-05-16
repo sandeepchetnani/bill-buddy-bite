@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { restaurantInfo } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
 
 interface Order {
   id: string;
@@ -40,6 +41,7 @@ const OrdersAdmin: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   
   useEffect(() => {
     fetchOrders();
@@ -82,18 +84,27 @@ const OrdersAdmin: React.FC = () => {
     setViewDialogOpen(true);
   };
   
+  // Navigate based on user role
+  const handleBackButtonClick = () => {
+    if (isAdmin()) {
+      navigate('/');  // Admin goes to home page
+    } else {
+      navigate('/tables');  // Waiter goes to tables page
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
       <div className="container max-w-7xl mx-auto py-6 px-4">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <Button 
-              onClick={() => navigate('/tables')}
+              onClick={handleBackButtonClick}
               variant="outline" 
               size="sm"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Tables
+              Back {isAdmin() ? 'to Home' : 'to Tables'}
             </Button>
             <h1 className="text-2xl font-bold">Orders Management</h1>
           </div>
