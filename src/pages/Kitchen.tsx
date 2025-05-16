@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -32,8 +33,8 @@ const convertJsonToBillItems = (jsonItems: Json): BillItem[] => {
   try {
     // Handle the case where jsonItems might already be an array
     if (Array.isArray(jsonItems)) {
-      // We need to verify each item has the required BillItem properties
-      return jsonItems.filter((item): item is BillItem => 
+      // Cast to unknown first before converting to the specific type
+      return (jsonItems as unknown[]).filter((item): item is BillItem => 
         item !== null && 
         typeof item === 'object' && 
         'itemId' in item && 
@@ -47,7 +48,7 @@ const convertJsonToBillItems = (jsonItems: Json): BillItem[] => {
     if (typeof jsonItems === 'string') {
       const parsedItems = JSON.parse(jsonItems);
       if (Array.isArray(parsedItems)) {
-        return parsedItems.filter((item): item is BillItem => 
+        return (parsedItems as unknown[]).filter((item): item is BillItem => 
           item !== null && 
           typeof item === 'object' && 
           'itemId' in item && 
