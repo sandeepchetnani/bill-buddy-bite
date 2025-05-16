@@ -98,28 +98,29 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
             </SheetDescription>
           </SheetHeader>
           
-          <div className="mt-6 space-y-6">
+          {/* Move the save & complete button to the top */}
+          <div className="mt-4 mb-6 flex justify-between">
+            <Button 
+              onClick={handleSaveQuickOrder}
+              variant="outline"
+              disabled={isSaving}
+              className="flex items-center gap-2"
+            >
+              <Check className="h-4 w-4" />
+              Save & Complete Order
+            </Button>
+            <Button 
+              onClick={handleCompleteOrder}
+              variant="default"
+              className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center gap-2"
+            >
+              Go to Detailed Order
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-6">
             <MenuItemSelection />
-            
-            <div className="pt-4 border-t flex justify-between">
-              <Button 
-                onClick={handleSaveQuickOrder}
-                variant="outline"
-                disabled={isSaving}
-                className="flex items-center gap-2"
-              >
-                <Check className="h-4 w-4" />
-                Save & Complete Order
-              </Button>
-              <Button 
-                onClick={handleCompleteOrder}
-                variant="default"
-                className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center gap-2"
-              >
-                Go to Detailed Order
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
         </SheetContent>
       </Sheet>
