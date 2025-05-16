@@ -9,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
   isAdmin: () => boolean;
   isWaiter: () => boolean;
+  isKitchen: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +25,7 @@ export const useAuth = () => {
 // Static credentials for demo
 const ADMIN_CREDENTIALS = { username: "thebasefour", password: "thebasefour98", role: "admin" as const };
 const WAITER_CREDENTIALS = { username: "waiter", password: "waiter123", role: "waiter" as const };
+const KITCHEN_CREDENTIALS = { username: "kitchen", password: "kitchen123", role: "kitchen" as const };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,6 +72,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(waiterUser);
       return true;
     }
+
+    // Check kitchen credentials
+    if (username === KITCHEN_CREDENTIALS.username && password === KITCHEN_CREDENTIALS.password) {
+      const kitchenUser: User = {
+        id: '3',
+        name: 'Kitchen',
+        role: KITCHEN_CREDENTIALS.role
+      };
+      
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('user', JSON.stringify(kitchenUser));
+      setIsLoggedIn(true);
+      setUser(kitchenUser);
+      return true;
+    }
     
     return false;
   };
@@ -88,9 +105,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isWaiter = () => {
     return user?.role === 'waiter';
   };
+
+  const isKitchen = () => {
+    return user?.role === 'kitchen';
+  };
   
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, isAdmin, isWaiter }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, isAdmin, isWaiter, isKitchen }}>
       {children}
     </AuthContext.Provider>
   );

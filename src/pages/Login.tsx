@@ -17,7 +17,7 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
-  const { login, isLoggedIn, isAdmin, isWaiter } = useAuth();
+  const { login, isLoggedIn, isAdmin, isWaiter, isKitchen } = useAuth();
   
   // Check if user is already logged in
   useEffect(() => {
@@ -26,9 +26,11 @@ const Login = () => {
         navigate('/');
       } else if (isWaiter()) {
         navigate('/tables');
+      } else if (isKitchen()) {
+        navigate('/kitchen');
       }
     }
-  }, [isLoggedIn, navigate, isAdmin, isWaiter]);
+  }, [isLoggedIn, navigate, isAdmin, isWaiter, isKitchen]);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +46,8 @@ const Login = () => {
           navigate('/');
         } else if (isWaiter()) {
           navigate('/tables');
+        } else if (isKitchen()) {
+          navigate('/kitchen');
         }
       } else {
         setError('Invalid username or password');
@@ -108,6 +112,7 @@ const Login = () => {
               <p>Demo credentials:</p>
               <p>Admin: thebasefour / thebasefour98</p>
               <p>Waiter: waiter / waiter123</p>
+              <p>Kitchen: kitchen / kitchen123</p>
             </div>
           </CardContent>
           <CardFooter>

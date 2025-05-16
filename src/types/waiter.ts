@@ -22,4 +22,10 @@ export interface AdminUser {
   role: 'admin';
 }
 
-export type User = WaiterUser | AdminUser;
+export interface KitchenUser {
+  id: string;
+  name: string;
+  role: 'kitchen';
+}
+
+export type User = WaiterUser | AdminUser | KitchenUser;

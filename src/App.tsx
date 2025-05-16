@@ -9,9 +9,11 @@ import Login from "./pages/Login";
 import Tables from "./pages/Tables";
 import Order from "./pages/Order";
 import OrdersAdmin from "./pages/OrdersAdmin";
+import Kitchen from "./pages/Kitchen";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedWaiterRoute from "./components/ProtectedWaiterRoute";
+import ProtectedKitchenRoute from "./components/ProtectedKitchenRoute";
 import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
@@ -63,6 +65,14 @@ const App = () => (
                 <ProtectedWaiterRoute>
                   <OrdersAdmin />
                 </ProtectedWaiterRoute>
+              } 
+            />
+            <Route 
+              path="/kitchen" 
+              element={
+                <ProtectedKitchenRoute>
+                  <Kitchen />
+                </ProtectedKitchenRoute>
               } 
             />
             <Route path="*" element={<NotFound />} />
