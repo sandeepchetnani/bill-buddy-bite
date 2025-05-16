@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { Table, TableBlock, TableNumber } from '../types/waiter';
 import { BillItem } from '../utils/billUtils';
 import { toast } from '@/components/ui/sonner';
 import { MenuItem } from '../data/mockData';
+import { supabase } from '../integrations/supabase/client';
 
 interface TablesContextType {
   tables: Table[];
@@ -160,18 +160,52 @@ export const TablesProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!currentTable) return;
     
     try {
-      // In a real app, this would send the order to the kitchen or billing system
-      // For demo purposes, we'll just clear the order and mark the table as occupied
+      const items = tableItems[currentTable.id] || [];
       
+      // Don't proceed if there are no items
+      if (items.length === 0) {
+        toast.error('Cannot complete empty order');
+        return;
+      }
+      
+      // Calculate total
+      const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Generate order number (timestamp-based)
+      const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
+      
+      // Save order to database
+      const { error } = await supabase.from('orders').insert({
+        table_id: currentTable.id,
+        table_block: currentTable.block,
+        table_number: currentTable.number,
+        items: items,
+        total: total,
+        order_number: orderNumber
+      });
+      
+      if (error) {
+        console.error('Failed to save order:', error);
+        toast.error('Failed to save order to database');
+        return;
+      }
+      
+      // Clear the table items
+      setTableItems(prev => ({
+        ...prev,
+        [currentTable.id]: []
+      }));
+      
+      // Update table status
       setTables(prev => 
         prev.map(t => 
           t.id === currentTable.id 
-            ? { ...t, orderInProgress: false, occupied: true } 
+            ? { ...t, orderInProgress: false, occupied: false } 
             : t
         )
       );
       
-      toast.success(`Order for Table ${currentTable.block}${currentTable.number} has been sent to kitchen`);
+      toast.success(`Order #${orderNumber} for Table ${currentTable.block}${currentTable.number} has been completed`);
       clearCurrentTable();
     } catch (error) {
       toast.error('Failed to complete order');

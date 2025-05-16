@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Tables from "./pages/Tables";
 import Order from "./pages/Order";
+import OrdersAdmin from "./pages/OrdersAdmin";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedWaiterRoute from "./components/ProtectedWaiterRoute";
@@ -53,6 +54,14 @@ const App = () => (
               element={
                 <ProtectedWaiterRoute>
                   <Order />
+                </ProtectedWaiterRoute>
+              } 
+            />
+            <Route 
+              path="/orders-admin" 
+              element={
+                <ProtectedWaiterRoute>
+                  <OrdersAdmin />
                 </ProtectedWaiterRoute>
               } 
             />

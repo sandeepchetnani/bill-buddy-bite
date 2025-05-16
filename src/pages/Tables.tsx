@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut } from 'lucide-react';
+import { LogOut, ClipboardList } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { TablesProvider, useTables } from '../context/TablesContext';
 import TableGrid from '../components/tables/TableGrid';
@@ -30,14 +30,24 @@ const TablesContent = () => {
             </h1>
             <p className="text-muted-foreground">Select a table to create or manage orders</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="flex items-center gap-1"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate('/orders-admin')}
+              variant="outline"
+              className="flex items-center gap-1"
+            >
+              <ClipboardList className="h-4 w-4 mr-1" />
+              Orders
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="flex items-center gap-1"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
         
         <Card>

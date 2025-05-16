@@ -33,6 +33,42 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          order_number: string
+          status: string
+          table_block: string
+          table_id: string
+          table_number: string
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items: Json
+          order_number: string
+          status?: string
+          table_block: string
+          table_id: string
+          table_number: string
+          total: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          order_number?: string
+          status?: string
+          table_block?: string
+          table_id?: string
+          table_number?: string
+          total?: number
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           bill_number: string
