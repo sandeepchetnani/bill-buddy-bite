@@ -13,7 +13,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { restaurantInfo } from '../data/mockData';
 
 interface Order {
   id: string;
@@ -161,43 +163,66 @@ const OrdersAdmin: React.FC = () => {
           </CardContent>
         </Card>
         
-        {/* View Order Dialog */}
+        {/* View Order Dialog - Styled similar to BillPreview */}
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>
-                Order #{selectedOrder?.order_number} - Table {selectedOrder?.table_block}{selectedOrder?.table_number}
+              <DialogTitle className="text-center text-2xl font-bold">
+                {restaurantInfo.name}
               </DialogTitle>
+              <div className="text-center text-sm text-muted-foreground">
+                <p>{restaurantInfo.address}</p>
+                <p>{restaurantInfo.phone}</p>
+              </div>
             </DialogHeader>
-            <div className="py-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">Subtotal</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {selectedOrder?.items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.price * item.quantity)}</TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
-                    <TableCell className="text-right font-bold">{selectedOrder ? formatCurrency(selectedOrder.total) : ''}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <div className="mt-4 text-sm text-muted-foreground">
-                Order created on {selectedOrder ? new Date(selectedOrder.created_at).toLocaleString() : ''}
+            
+            <div className="border-t border-b py-4">
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">Order #{selectedOrder?.order_number}</span>
+                <span className="text-muted-foreground">
+                  {selectedOrder ? new Date(selectedOrder.created_at).toLocaleString() : ''}
+                </span>
+              </div>
+              
+              <div className="space-y-3">
+                {selectedOrder?.items.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="flex justify-between items-center border-b pb-2 last:border-0"
+                  >
+                    <div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatCurrency(item.price)} × {item.quantity}
+                      </div>
+                    </div>
+                    <span className="font-semibold">
+                      {formatCurrency(item.price * item.quantity)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-4 flex justify-between text-lg font-bold">
+                <span>Total</span>
+                <span>{selectedOrder ? formatCurrency(selectedOrder.total) : ''}</span>
               </div>
             </div>
+
+            <div className="text-center mt-2 text-sm text-muted-foreground">
+              <p>Thank you for dining with us!</p>
+              <p>Table {selectedOrder?.table_block}{selectedOrder?.table_number}</p>
+            </div>
+            
+            <DialogFooter className="flex justify-between border-t pt-4">
+              <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
+                Close
+              </Button>
+              <Button onClick={() => handlePrintOrder(selectedOrder!)} variant="default">
+                <Printer className="mr-2 h-4 w-4" />
+                Print Order
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         
@@ -205,40 +230,38 @@ const OrdersAdmin: React.FC = () => {
         {selectedOrder && (
           <div className="hidden print:block p-4">
             <div className="text-center mb-6">
-              <h1 className="text-xl font-bold">Order Receipt</h1>
-              <p className="text-muted-foreground">Order #{selectedOrder.order_number}</p>
-              <p className="text-muted-foreground">
-                Table {selectedOrder.table_block}{selectedOrder.table_number} - 
-                {new Date(selectedOrder.created_at).toLocaleString()}
-              </p>
+              <h1 className="text-xl font-bold">{restaurantInfo.name}</h1>
+              <p className="text-muted-foreground">{restaurantInfo.address}</p>
+              <p className="text-muted-foreground">{restaurantInfo.phone}</p>
+              <div className="my-4 border-t border-b py-2">
+                <p className="font-semibold">Order #{selectedOrder.order_number}</p>
+                <p className="text-sm">
+                  Table {selectedOrder.table_block}{selectedOrder.table_number} - 
+                  {new Date(selectedOrder.created_at).toLocaleString()}
+                </p>
+              </div>
             </div>
             
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Subtotal</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedOrder.items.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell className="text-right">{item.quantity}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(item.price * item.quantity)}</TableCell>
-                  </TableRow>
-                ))}
-                <TableRow>
-                  <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
-                  <TableCell className="text-right font-bold">{formatCurrency(selectedOrder.total)}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <div className="space-y-3 mb-4">
+              {selectedOrder.items.map((item, index) => (
+                <div key={index} className="flex justify-between border-b pb-2">
+                  <div>
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm">{formatCurrency(item.price)} × {item.quantity}</div>
+                  </div>
+                  <div className="font-semibold">
+                    {formatCurrency(item.price * item.quantity)}
+                  </div>
+                </div>
+              ))}
+            </div>
             
-            <div className="mt-8 text-center text-sm text-muted-foreground">
+            <div className="flex justify-between font-bold text-lg mt-4 border-t pt-2">
+              <span>Total</span>
+              <span>{formatCurrency(selectedOrder.total)}</span>
+            </div>
+            
+            <div className="mt-8 text-center text-sm">
               <p>Thank you for your order!</p>
             </div>
           </div>
