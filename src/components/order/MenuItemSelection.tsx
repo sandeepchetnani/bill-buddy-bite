@@ -12,7 +12,7 @@ import LoadingState from '../items/LoadingState';
 
 const MenuItemSelection = () => {
   const { isLoading, items, categories } = useMenuItems();
-  const { addItemToTable } = useTables();
+  const { addItemToTable, currentTable, tableItems } = useTables();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | 'all'>('all');
   
@@ -23,13 +23,21 @@ const MenuItemSelection = () => {
     
     return matchesSearch && matchesCategory;
   });
+
+  // Get quantities for items in the current table
+  const getItemQuantity = (itemId: string): number => {
+    if (!currentTable) return 0;
+    
+    const tableItem = tableItems[currentTable.id]?.find(item => item.itemId === itemId);
+    return tableItem?.quantity || 0;
+  };
   
   if (isLoading) {
     return <LoadingState />;
   }
   
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className="bg-white rounded-lg">
       <div className="p-4">
         <div className="relative mb-4">
           <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -41,7 +49,7 @@ const MenuItemSelection = () => {
           />
         </div>
         
-        <Tabs defaultValue="all" onValueChange={(value) => setActiveCategory(value)}>
+        <Tabs defaultValue="all" onValueChange={(value) => setActiveCategory(value as string)}>
           <TabsList className="mb-4 w-full overflow-auto">
             <TabsTrigger value="all">All</TabsTrigger>
             {categories.map((category) => (
@@ -52,30 +60,41 @@ const MenuItemSelection = () => {
           </TabsList>
           
           <TabsContent value={activeCategory}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {filteredItems.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="border rounded-md p-3 flex justify-between items-center hover:bg-gray-50"
-                >
-                  <div>
-                    <h4 className="font-medium">{item.name}</h4>
-                    <p className="text-muted-foreground">{formatCurrency(item.price)}</p>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => addItemToTable(item)}
+            <div className="grid grid-cols-1 gap-3">
+              {filteredItems.map((item) => {
+                const quantity = getItemQuantity(item.id);
+                
+                return (
+                  <div 
+                    key={item.id} 
+                    className="border rounded-md p-3 flex justify-between items-center hover:bg-gray-50"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
-              ))}
+                    <div>
+                      <h4 className="font-medium">{item.name}</h4>
+                      <p className="text-muted-foreground">{formatCurrency(item.price)}</p>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      {quantity > 0 && (
+                        <span className="mr-3 px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium">
+                          {quantity}x
+                        </span>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => addItemToTable(item)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
               
               {filteredItems.length === 0 && (
-                <div className="col-span-2 py-8 text-center text-muted-foreground">
+                <div className="py-8 text-center text-muted-foreground">
                   No items found
                 </div>
               )}
