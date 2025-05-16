@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
-import { useTables } from '../context/TablesContext';
+import { useTables, TablesProvider } from '../context/TablesContext';
 import OrderItems from '../components/order/OrderItems';
 import MenuItemSelection from '../components/order/MenuItemSelection';
 import { toast } from '@/components/ui/sonner';
 import { formatCurrency } from '../utils/billUtils';
 
-const Order = () => {
+// Create a separate component for the Order content to use the useTables hook
+const OrderContent = () => {
   const { currentTable, tableItems, clearCurrentTable, completeOrder } = useTables();
   const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState(0);
@@ -105,6 +106,15 @@ const Order = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Main Order component that wraps OrderContent with TablesProvider
+const Order = () => {
+  return (
+    <TablesProvider>
+      <OrderContent />
+    </TablesProvider>
   );
 };
 
