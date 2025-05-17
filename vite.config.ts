@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -5,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: mode === "production" ? "/" : "/",
+  base: mode === "production" ? "/bill-buddy-bite/" : "/",
   server: {
     allowedHosts: ['sandeepchetnani.github.io/bill-buddy-bite'],
     host: "::",
@@ -21,4 +22,3 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
-//https://sandeepchetnani.github.io/bill-buddy-bite/
