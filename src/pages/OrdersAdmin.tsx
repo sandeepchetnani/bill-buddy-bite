@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Eye, Trash2, Printer } from 'lucide-react';
+import { ArrowLeft, Eye, Trash2, Printer, Check } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { formatCurrency } from '../utils/billUtils';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { restaurantInfo } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
+import { useBill } from '../context/BillContext';
 
 interface Order {
   id: string;
@@ -53,9 +54,11 @@ const OrdersAdmin: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [processingPaid, setProcessingPaid] = useState<string | null>(null);
   const printFrameRef = useRef<HTMLIFrameElement | null>(null);
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { addTransactionFromOrder } = useBill();
   
   useEffect(() => {
     fetchOrders();
@@ -109,6 +112,34 @@ const OrdersAdmin: React.FC = () => {
       setDeletingId(null);
     }
   };
+
+  const handleMarkAsPaid = async (order: Order) => {
+    try {
+      setProcessingPaid(order.id);
+
+      // Add order to transactions
+      await addTransactionFromOrder(order);
+      
+      // Delete from orders
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', order.id);
+        
+      if (error) {
+        throw error;
+      }
+
+      // Update local state
+      setOrders(prev => prev.filter(o => o.id !== order.id));
+      toast.success(`Order #${order.order_number} marked as paid and saved to transaction history`);
+    } catch (error) {
+      console.error('Error marking order as paid:', error);
+      toast.error('Failed to process payment');
+    } finally {
+      setProcessingPaid(null);
+    }
+  };
   
   const handlePrintOrder = (order: Order) => {
     if (!order) return;
@@ -144,6 +175,9 @@ const OrdersAdmin: React.FC = () => {
             .item-total { font-weight: bold; }
             .total { display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-top: 15px; }
             .footer { margin-top: 30px; text-align: center; font-size: 14px; color: #666; }
+            @media print {
+              .no-print { display: none !important; }
+            }
           </style>
         </head>
         <body>
@@ -336,6 +370,34 @@ const OrdersAdmin: React.FC = () => {
                             >
                               <Eye className="h-3 w-3 sm:mr-1" />
                               <span className="hidden sm:inline">View</span>
+                            </Button>
+                            {isAdmin() && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleMarkAsPaid(order)}
+                                className="h-8 px-2 sm:px-3 text-green-500 hover:text-green-600 hover:border-green-300"
+                                disabled={processingPaid === order.id}
+                              >
+                                {processingPaid === order.id ? (
+                                  <svg className="animate-spin h-3 w-3 sm:mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  <Check className="h-3 w-3 sm:mr-1" />
+                                )}
+                                <span className="hidden sm:inline">Paid</span>
+                              </Button>
+                            )}
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handlePrintOrder(order)}
+                              className="h-8 px-2 sm:px-3"
+                            >
+                              <Printer className="h-3 w-3 sm:mr-1" />
+                              <span className="hidden sm:inline">Print</span>
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>

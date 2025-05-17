@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BillItem, Bill, createBill } from '../utils/billUtils';
 import { Transaction } from '../data/mockData';
@@ -22,6 +21,7 @@ interface BillContextType {
   currentEditingId: string | null;
   cancelEditing: () => void;
   nextBillNumber: string;
+  addTransactionFromOrder: (order: any) => Promise<void>;
 }
 
 const BillContext = createContext<BillContextType | undefined>(undefined);
@@ -93,6 +93,46 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error('Failed to load transactions');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to add a transaction from an order (for the Paid button)
+  const addTransactionFromOrder = async (order: any) => {
+    try {
+      // Create transaction data from order
+      const transactionData = {
+        bill_number: order.order_number, // Use order number as bill number
+        date: new Date().toISOString(), // Use current date/time for payment
+        total: order.total,
+        items: order.items as unknown as Json
+      };
+      
+      // Insert into transactions table
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert(transactionData)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Create a transaction to add to our local state
+      const newTransaction: Transaction = {
+        id: data.id,
+        billNumber: data.bill_number,
+        date: data.date,
+        total: Number(data.total),
+        items: data.items as unknown as BillItem[]
+      };
+      
+      // Add the new transaction to the beginning of the array
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      return;
+    } catch (err) {
+      console.error('Error adding transaction from order:', err);
+      toast.error('Failed to add transaction');
+      throw err;
     }
   };
 
@@ -274,7 +314,8 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isEditing,
       currentEditingId,
       cancelEditing,
-      nextBillNumber
+      nextBillNumber,
+      addTransactionFromOrder
     }}>
       {children}
     </BillContext.Provider>
