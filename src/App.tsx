@@ -20,9 +20,7 @@ const queryClient = new QueryClient();
 
 // Get the base URL based on environment
 const getBaseUrl = () => {
-  if (import.meta.env.MODE === 'production') {
-    return '/bill-buddy-bite';
-  }
+  // For custom domain, we use root path
   return '';
 };
 
