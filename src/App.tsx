@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 // Get the base URL based on environment
 const getBaseUrl = () => {
-  // For custom domain, we use root path
+  // For lovable domain, we use root path
   return '';
 };
 

@@ -6,9 +6,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/", // Changed to root path for custom domain
+  base: "/", // Root path for custom domain
   server: {
-    allowedHosts: ['sandeepchetnani.github.io/bill-buddy-bite', 'restuarantbill.lovable.app'],
+    allowedHosts: ['restuarantbill.lovable.app'],
     host: "::",
     port: 8080,
   },
