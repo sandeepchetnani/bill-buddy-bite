@@ -108,14 +108,6 @@ const TableItem: React.FC<TableItemProps> = ({ table }) => {
               <Check className="h-4 w-4" />
               Save & Complete Order
             </Button>
-            <Button 
-              onClick={handleCompleteOrder}
-              variant="default"
-              className="bg-restaurant-primary text-white hover:bg-restaurant-secondary flex items-center justify-center gap-2"
-            >
-              Go to Detailed Order
-              <ArrowRight className="h-4 w-4" />
-            </Button>
           </div>
           
           <div className="space-y-6">
