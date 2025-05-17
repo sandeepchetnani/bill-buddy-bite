@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedWaiterRoute from "./components/ProtectedWaiterRoute";
 import ProtectedKitchenRoute from "./components/ProtectedKitchenRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { BillProvider } from "./context/BillContext";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,9 @@ const App = () => (
               path="/orders-admin" 
               element={
                 <ProtectedWaiterRoute>
-                  <OrdersAdmin />
+                  <BillProvider>
+                    <OrdersAdmin />
+                  </BillProvider>
                 </ProtectedWaiterRoute>
               } 
             />
