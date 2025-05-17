@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -399,49 +398,52 @@ const OrdersAdmin: React.FC = () => {
                               <Printer className="h-3 w-3 sm:mr-1" />
                               <span className="hidden sm:inline">Print</span>
                             </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  className="h-8 px-2 sm:px-3 text-red-500 hover:text-red-600 hover:border-red-300"
-                                >
-                                  <Trash2 className="h-3 w-3 sm:mr-1" />
-                                  <span className="hidden sm:inline">Delete</span>
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent className="sm:max-w-md">
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Order</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete order {order.order_number}?
-                                    This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      handleDeleteOrder(order.id);
-                                    }}
-                                    className="bg-red-500 hover:bg-red-600"
+                            {/* Only show delete button for admin users */}
+                            {isAdmin() && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="h-8 px-2 sm:px-3 text-red-500 hover:text-red-600 hover:border-red-300"
                                   >
-                                    {deletingId === order.id ? (
-                                      <span className="flex items-center">
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Deleting...
-                                      </span>
-                                    ) : (
-                                      "Delete"
-                                    )}
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                                    <Trash2 className="h-3 w-3 sm:mr-1" />
+                                    <span className="hidden sm:inline">Delete</span>
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="sm:max-w-md">
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Order</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete order {order.order_number}?
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleDeleteOrder(order.id);
+                                      }}
+                                      className="bg-red-500 hover:bg-red-600"
+                                    >
+                                      {deletingId === order.id ? (
+                                        <span className="flex items-center">
+                                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                          </svg>
+                                          Deleting...
+                                        </span>
+                                      ) : (
+                                        "Delete"
+                                      )}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
