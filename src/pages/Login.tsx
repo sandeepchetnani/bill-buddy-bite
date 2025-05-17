@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -104,12 +105,6 @@ const Login = () => {
                   required
                 />
               </div>
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground bg-gray-50 p-2 rounded">
-              <p>Demo credentials:</p>
-              <p>Admin: thebasefour / thebasefour98</p>
-              <p>Waiter: waiter / waiter123</p>
-              <p>Kitchen: kitchen / kitchen123</p>
             </div>
           </CardContent>
           <CardFooter>
