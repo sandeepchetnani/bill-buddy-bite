@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -28,7 +29,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { restaurantInfo } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { generatePrintContent } from '../utils/billUtils';
 
 interface Order {
   id: string;
@@ -53,6 +53,7 @@ const OrdersAdmin: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const printFrameRef = useRef<HTMLIFrameElement | null>(null);
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   
@@ -110,12 +111,153 @@ const OrdersAdmin: React.FC = () => {
   };
   
   const handlePrintOrder = (order: Order) => {
-    setSelectedOrder(order);
+    if (!order) return;
     
-    // Use setTimeout to allow the modal to render before printing
-    setTimeout(() => {
-      window.print();
-    }, 100);
+    // Generate print content
+    const printContent = generatePrintContent(order);
+    
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error('Pop-up blocked. Please allow pop-ups to print the order.');
+      return;
+    }
+    
+    // Write the print content to the new window
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${restaurantInfo.name} - Order ${order.order_number}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+            .container { max-width: 380px; margin: 0 auto; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .header h1 { margin: 0; font-size: 24px; }
+            .header p { margin: 5px 0; font-size: 14px; color: #666; }
+            .order-info { margin-bottom: 20px; font-size: 14px; }
+            .items { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 15px 0; }
+            .item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+            .item-details { flex: 1; }
+            .item-name { font-weight: bold; }
+            .item-price { color: #666; font-size: 13px; }
+            .item-total { font-weight: bold; }
+            .total { display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-top: 15px; }
+            .footer { margin-top: 30px; text-align: center; font-size: 14px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>${restaurantInfo.name}</h1>
+              <p>${restaurantInfo.address}</p>
+              <p>${restaurantInfo.phone}</p>
+            </div>
+            
+            <div class="order-info">
+              <p><strong>Order #${order.order_number}</strong></p>
+              <p>${new Date(order.created_at).toLocaleString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Kolkata'
+              })}</p>
+              <p>Table ${order.table_block}${order.table_number}</p>
+            </div>
+            
+            <div class="items">
+              ${order.items.map(item => `
+                <div class="item">
+                  <div class="item-details">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">${formatCurrency(item.price)} × ${item.quantity}</div>
+                  </div>
+                  <div class="item-total">${formatCurrency(item.price * item.quantity)}</div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="total">
+              <span>Total</span>
+              <span>${formatCurrency(order.total)}</span>
+            </div>
+            
+            <div class="footer">
+              <p>Thank you for dining with us!</p>
+              <p>Please visit again</p>
+            </div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() {
+                window.close();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  const generatePrintContent = (order: Order) => {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; font-size: 18px; font-weight: bold;">${restaurantInfo.name}</div>
+        <div style="text-align: center;">${restaurantInfo.address}</div>
+        <div style="text-align: center;">${restaurantInfo.phone}</div>
+        
+        <div style="margin: 20px 0; border-top: 1px dashed #000;"></div>
+        
+        <div>Order #: ${order.order_number}</div>
+        <div>Date: ${new Date(order.created_at).toLocaleString('en-IN', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'Asia/Kolkata'
+        })}</div>
+        <div>Table: ${order.table_block}${order.table_number}</div>
+        
+        <div style="margin: 20px 0; border-top: 1px dashed #000;"></div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Item</th>
+              <th style="text-align: center;">Qty</th>
+              <th style="text-align: right;">Price</th>
+              <th style="text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.items.map(item => `
+              <tr>
+                <td style="text-align: left;">${item.name}</td>
+                <td style="text-align: center;">${item.quantity}</td>
+                <td style="text-align: right;">${formatCurrency(item.price)}</td>
+                <td style="text-align: right;">${formatCurrency(item.price * item.quantity)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        <div style="margin: 20px 0; border-top: 1px dashed #000;"></div>
+        
+        <div style="display: flex; justify-content: space-between;">
+          <div style="font-weight: bold;">Total:</div>
+          <div style="font-weight: bold;">${formatCurrency(order.total)}</div>
+        </div>
+        
+        <div style="margin: 20px 0; border-top: 1px dashed #000;"></div>
+        
+        <div style="text-align: center; margin-top: 15px;">Thank you for dining with us!</div>
+      </div>
+    `;
   };
 
   const handleViewOrder = (order: Order) => {
@@ -256,10 +398,10 @@ const OrdersAdmin: React.FC = () => {
               <DialogTitle className="text-center text-xl sm:text-2xl font-bold">
                 {restaurantInfo.name}
               </DialogTitle>
-              <div className="text-center text-sm text-muted-foreground">
+              <DialogDescription className="text-center">
                 <p>{restaurantInfo.address}</p>
                 <p>{restaurantInfo.phone}</p>
-              </div>
+              </DialogDescription>
             </DialogHeader>
             
             <div className="border-t border-b py-4">
@@ -304,7 +446,10 @@ const OrdersAdmin: React.FC = () => {
               <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
                 Close
               </Button>
-              <Button onClick={() => handlePrintOrder(selectedOrder!)} variant="default">
+              <Button 
+                onClick={() => selectedOrder && handlePrintOrder(selectedOrder)} 
+                variant="default"
+              >
                 <Printer className="mr-2 h-4 w-4" />
                 Print Order
               </Button>
@@ -312,62 +457,12 @@ const OrdersAdmin: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Print-only order details section - Improved formatting */}
-        {selectedOrder && (
-          <div className="hidden print:block p-4">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold">{restaurantInfo.name}</h1>
-              <p>{restaurantInfo.address}</p>
-              <p>{restaurantInfo.phone}</p>
-            </div>
-            
-            <div className="border-t border-b py-4 mb-4">
-              <div className="flex justify-between mb-2 flex-wrap">
-                <span className="font-semibold">Order #{selectedOrder.order_number}</span>
-                <span>
-                  {new Date(selectedOrder.created_at).toLocaleString('en-IN', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Asia/Kolkata'
-                  })}
-                </span>
-              </div>
-              
-              <div className="mb-4 border-b pb-2">
-                <p>Table: {selectedOrder.table_block}{selectedOrder.table_number}</p>
-              </div>
-              
-              <div className="space-y-4">
-                {selectedOrder.items.map((item, index) => (
-                  <div key={index} className="flex justify-between border-b pb-3 last:border-0">
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm">
-                        {formatCurrency(item.price)} × {item.quantity}
-                      </div>
-                    </div>
-                    <div className="font-semibold">
-                      {formatCurrency(item.price * item.quantity)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="flex justify-between font-bold text-lg mt-4 border-t pt-2">
-              <span>Total</span>
-              <span>{formatCurrency(selectedOrder.total)}</span>
-            </div>
-            
-            <div className="mt-8 text-center">
-              <p>Thank you for dining with us!</p>
-              <p>Please visit again</p>
-            </div>
-          </div>
-        )}
+        {/* Hidden iframe for printing (not using this approach anymore) */}
+        <iframe 
+          ref={printFrameRef}
+          style={{ display: 'none' }} 
+          title="Print Frame"
+        />
       </div>
     </div>
   );
