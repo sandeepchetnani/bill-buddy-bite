@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { restaurantInfo } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
+import { generatePrintContent } from '../utils/billUtils';
 
 interface Order {
   id: string;
@@ -133,8 +134,8 @@ const OrdersAdmin: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
-      <div className="container max-w-7xl mx-auto py-4 px-2 sm:px-4 sm:py-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+      <div className="container max-w-7xl mx-auto py-4 px-2 sm:px-4 sm:py-6 print:p-0">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6 print:hidden">
           <div className="flex items-center gap-2">
             <Button 
               onClick={handleBackButtonClick}
@@ -151,19 +152,19 @@ const OrdersAdmin: React.FC = () => {
           </Button>
         </div>
         
-        <Card>
-          <CardHeader className="py-4">
+        <Card className="print:shadow-none print:border-0">
+          <CardHeader className="py-4 print:hidden">
             <CardTitle className="text-lg sm:text-xl">Completed Orders</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="print:p-0">
             {loading ? (
-              <div className="flex justify-center py-10">Loading orders...</div>
+              <div className="flex justify-center py-10 print:hidden">Loading orders...</div>
             ) : orders.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
+              <div className="text-center py-10 text-muted-foreground print:hidden">
                 No orders found
               </div>
             ) : (
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="overflow-x-auto -mx-4 sm:mx-0 print:mx-0 print:hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -250,7 +251,7 @@ const OrdersAdmin: React.FC = () => {
         
         {/* View Order Dialog - Styled similar to BillPreview */}
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto print:hidden">
             <DialogHeader>
               <DialogTitle className="text-center text-xl sm:text-2xl font-bold">
                 {restaurantInfo.name}
@@ -311,34 +312,49 @@ const OrdersAdmin: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Print-only order details section */}
+        {/* Print-only order details section - Improved formatting */}
         {selectedOrder && (
           <div className="hidden print:block p-4">
             <div className="text-center mb-6">
-              <h1 className="text-xl font-bold">{restaurantInfo.name}</h1>
-              <p className="text-muted-foreground">{restaurantInfo.address}</p>
-              <p className="text-muted-foreground">{restaurantInfo.phone}</p>
-              <div className="my-4 border-t border-b py-2">
-                <p className="font-semibold">Order #{selectedOrder.order_number}</p>
-                <p className="text-sm">
-                  Table {selectedOrder.table_block}{selectedOrder.table_number} - 
-                  {new Date(selectedOrder.created_at).toLocaleString()}
-                </p>
-              </div>
+              <h1 className="text-2xl font-bold">{restaurantInfo.name}</h1>
+              <p>{restaurantInfo.address}</p>
+              <p>{restaurantInfo.phone}</p>
             </div>
             
-            <div className="space-y-3 mb-4">
-              {selectedOrder.items.map((item, index) => (
-                <div key={index} className="flex justify-between border-b pb-2">
-                  <div>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-sm">{formatCurrency(item.price)} × {item.quantity}</div>
+            <div className="border-t border-b py-4 mb-4">
+              <div className="flex justify-between mb-2 flex-wrap">
+                <span className="font-semibold">Order #{selectedOrder.order_number}</span>
+                <span>
+                  {new Date(selectedOrder.created_at).toLocaleString('en-IN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Asia/Kolkata'
+                  })}
+                </span>
+              </div>
+              
+              <div className="mb-4 border-b pb-2">
+                <p>Table: {selectedOrder.table_block}{selectedOrder.table_number}</p>
+              </div>
+              
+              <div className="space-y-4">
+                {selectedOrder.items.map((item, index) => (
+                  <div key={index} className="flex justify-between border-b pb-3 last:border-0">
+                    <div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm">
+                        {formatCurrency(item.price)} × {item.quantity}
+                      </div>
+                    </div>
+                    <div className="font-semibold">
+                      {formatCurrency(item.price * item.quantity)}
+                    </div>
                   </div>
-                  <div className="font-semibold">
-                    {formatCurrency(item.price * item.quantity)}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             
             <div className="flex justify-between font-bold text-lg mt-4 border-t pt-2">
@@ -346,8 +362,9 @@ const OrdersAdmin: React.FC = () => {
               <span>{formatCurrency(selectedOrder.total)}</span>
             </div>
             
-            <div className="mt-8 text-center text-sm">
-              <p>Thank you for your order!</p>
+            <div className="mt-8 text-center">
+              <p>Thank you for dining with us!</p>
+              <p>Please visit again</p>
             </div>
           </div>
         )}
